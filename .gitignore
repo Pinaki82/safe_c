@@ -50,3 +50,17 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Project-specific
+/build
+*.exe
+backup_code.txt
+compile_flags.txt
+.ccls
+tagspath.txt
+splint_output.txt
+cppcheck_output.txt
+tags
+/tests
+*.orig
+*.bak
