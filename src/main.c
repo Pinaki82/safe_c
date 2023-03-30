@@ -1,0 +1,22 @@
+// Last Change: 2023-03-29  Wednesday: 04:55:18 PM
+#include <stdio.h>
+#include "sf_c.h"
+
+int main() { // main function
+  char dest[14]; // increased size of dest array
+  char buffer[100];
+  const char *src = "hello";
+  size_t n = 5;
+  sf_strcpy(dest, "Hello, world!", sizeof(dest));
+  printf("%s\n", dest);
+  sf_strncpy(dest, src, n);
+  printf("%s\n", dest);
+
+  if(sf_gets(buffer, sizeof(buffer), stdin) != NULL) { // if buffer is not empty
+    printf("You entered: %s", buffer);
+  }
+
+  printf("%s\n", dest);
+  return 0;
+}
+
