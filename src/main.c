@@ -9,6 +9,7 @@ int main() { // main function
   char buffer[100];
   const char *src = "hello";
   size_t n = 5;
+  int one_char;
   sf_strcpy(dest, "Hello, world!", sizeof(dest));
   printf("%s\n", dest);
   sf_strncpy(dest, src, n);
@@ -23,6 +24,9 @@ int main() { // main function
   printf("Enter a number: ");
   sf_scanf("%d", &num, MAXBUFF);
   printf("You entered: %d\n", num);
+  printf("Enter a character: ");
+  one_char = sf_getchar();
+  printf("The entered character is : %c\n", one_char);
   return 0;
 }
 

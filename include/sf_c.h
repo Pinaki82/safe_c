@@ -10,11 +10,16 @@
 //MACRO, global variables, etc..
 #define MAXBUFF 1E+5f   // integer 1x10^+5 = 1 M. the max no. chars that will be dealt with.
 
+#ifndef BUFSIZ // needed by sf_getchar()
+  #define BUFSIZ 1024
+#endif
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// https://learn.microsoft.com/en-us/cpp/c-runtime-library/file-constants?view=msvc-170
+#include <fcntl.h>
 
 
 
@@ -40,6 +45,9 @@ char *sf_gets(char *str, int size, FILE *stream);
 
 // an alternative function to scanf() that checks buffer size as an argument
 int sf_scanf(char *format, void *arg, size_t max_len);
+
+// an alternative function to getchar(() that handles input more appropriately
+int sf_getchar(void);
 
 
 #ifdef __cplusplus
@@ -169,9 +177,29 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   return result;
 }
 
+// an alternative function to getchar(() that handles input more appropriately
+int sf_getchar(void) {
+  static char buf[BUFSIZ];
+  static char *bufp = buf;
+  static int n = 0;
+
+  if(n == 0) {
+    n = read(0, buf, sizeof buf);
+    bufp = buf;
+  }
+
+  if(--n >= 0) {
+    return *bufp++;
+  }
+
+  return EOF;
+}
+
+
 #define strlen sf_strlen
 #define strcpy sf_strcpy
 #define strncpy sf_strncpy
 #define gets sf_gets
 #define scanf sf_scanf
+#define getchar sf_getchar
 
