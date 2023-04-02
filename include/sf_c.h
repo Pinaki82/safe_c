@@ -1,4 +1,4 @@
-// Last Change: 2023-04-02  Sunday: 10:20:54 PM
+// Last Change: 2023-04-03  Monday: 12:07:14 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -45,6 +45,9 @@ char *sf_gets(char *str, int size, FILE *stream);
 
 // an alternative function to scanf() that checks buffer size as an argument
 int sf_scanf(char *format, void *arg, size_t max_len);
+
+// an alternative function to sscanf() that checks buffer size as an argument
+int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len);
 
 // an alternative function to getchar(() that handles input more appropriately
 int sf_getchar(void);
@@ -177,6 +180,26 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   return result;
 }
 
+// an alternative function to sscanf() that checks buffer size as an argument
+int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len) {
+  // Allocate memory for a copy of the string
+  char *str_copy = (char *)malloc(max_len + 1);
+
+  if(!str_copy) {
+    // Failed to allocate memory
+    return EOF;
+  }
+
+  // Copy the input string
+  strncpy(str_copy, str, max_len);
+  str_copy[max_len] = '\0';
+  // Parse the input using sscanf()
+  int result = sscanf(str_copy, format, arg);
+  // Free the memory used by the string copy
+  free(str_copy);
+  return result;
+}
+
 // an alternative function to getchar(() that handles input more appropriately
 int sf_getchar(void) {
   static char buf[BUFSIZ];
@@ -196,10 +219,13 @@ int sf_getchar(void) {
 }
 
 
+
 #define strlen sf_strlen
 #define strcpy sf_strcpy
 #define strncpy sf_strncpy
 #define gets sf_gets
 #define scanf sf_scanf
+#define sscanf sf_sscanf
 #define getchar sf_getchar
+
 
