@@ -38,6 +38,9 @@ void sf_strncpy(char *dest, const char *src, size_t n);
 // an alternative function to gets() that checks buffer size as an argument
 char *sf_gets(char *str, int size, FILE *stream);
 
+// an alternative function to scanf() that checks buffer size as an argument
+int sf_scanf(char *format, void *arg, size_t max_len);
+
 
 #ifdef __cplusplus
 }
@@ -141,8 +144,34 @@ char *sf_gets(char *str, int size, FILE *stream) { //size=sizeof(dest).
 // strncpy, and gets from the compiler provided library anymore
 // because they are now macros and they are re-defined here.
 
+
+int sf_scanf(char *format, void *arg, size_t max_len) {
+  // Read a line of input from stdin
+  char *line = (char *)malloc(max_len + 1);
+
+  if(!fgets(line, max_len + 1, stdin)) {
+    // Error reading input
+    free(line);
+    return EOF;
+  }
+
+  // Check if input exceeded max length
+  if(strlen(line) == max_len && line[max_len - 1] != '\n') {
+    // Input exceeded max length
+    fprintf(stderr, "Input exceeded maximum length of %zu characters\n", max_len);
+    free(line);
+    return EOF;
+  }
+
+  // Parse the input using sscanf()
+  int result = sscanf(line, format, arg);
+  free(line);
+  return result;
+}
+
 #define strlen sf_strlen
 #define strcpy sf_strcpy
 #define strncpy sf_strncpy
 #define gets sf_gets
+#define scanf sf_scanf
 

@@ -17,6 +17,10 @@ int main() { // main function
   }
 
   printf("%s\n", dest);
+  int num;
+  printf("Enter a number: ");
+  sf_scanf("%d", &num, MAXBUFF);
+  printf("You entered: %d\n", num);
   return 0;
 }
 
