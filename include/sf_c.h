@@ -1,4 +1,4 @@
-// Last Change: 2023-03-29  Wednesday: 04:58:34 PM
+// Last Change: 2023-04-02  Sunday: 10:20:54 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -8,7 +8,7 @@
 
 
 //MACRO, global variables, etc..
-#define MAXBUFF 1E+5d   // integer 1x10^+5 = 1 M. the max no. chars that will be dealt with.
+#define MAXBUFF 1E+5f   // integer 1x10^+5 = 1 M. the max no. chars that will be dealt with.
 
 
 #include <math.h>
@@ -79,7 +79,7 @@ size_t sf_strlen(const char *str, size_t max_len) {
     }
 
     else {
-      return end - str;
+      return (size_t)(end - str);
     }
   }
 }
@@ -149,7 +149,7 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   // Read a line of input from stdin
   char *line = (char *)malloc(max_len + 1);
 
-  if(!fgets(line, max_len + 1, stdin)) {
+  if(!fgets(line, (int)(max_len + 1), stdin)) {
     // Error reading input
     free(line);
     return EOF;

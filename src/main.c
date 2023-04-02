@@ -1,7 +1,9 @@
-// Last Change: 2023-03-29  Wednesday: 04:55:18 PM
+// Last Change: 2023-04-02  Sunday: 10:21:15 PM
 #include <stdio.h>
 #include "sf_c.h"
-
+#ifndef  MAXBUFF
+  #define  MAXBUFF  1E+5d
+#endif
 int main() { // main function
   char dest[14]; // increased size of dest array
   char buffer[100];
@@ -17,7 +19,7 @@ int main() { // main function
   }
 
   printf("%s\n", dest);
-  int num;
+  int num = 0;
   printf("Enter a number: ");
   sf_scanf("%d", &num, MAXBUFF);
   printf("You entered: %d\n", num);
