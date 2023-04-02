@@ -23,6 +23,26 @@
 
 
 
+#define strcpy strcpy
+#if defined(_MSC_VER)
+  #if defined(strcpy)
+    __pragma(message("WARNING: Use of strcpy() may be unsafe! Use sf_strcpy() or, Look at https://github.com/rurban/safeclib"))
+  #endif
+#else
+  #ifdef __GNUC__
+    #if defined(strcpy)
+      _Pragma("message(\"WARNING: Use of strcpy() may be unsafe! Use sf_strcpy() or, Look at https://github.com/rurban/safeclib\")")
+    #endif
+  #endif
+#endif
+
+
+
+
+
+
+
+
 
 
 #ifdef __cplusplus
