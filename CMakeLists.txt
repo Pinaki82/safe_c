@@ -21,7 +21,7 @@ add_executable(safe_c
 
 # Add compiler flags for GCC and Clang
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(safe_c PRIVATE -Wall -Wextra)
+  target_compile_options(safe_c PRIVATE -Wall -Wextra -isystem safeclib/safe_lib.h)
 endif()
 
 # Add compiler flags for MSVC
@@ -32,7 +32,7 @@ endif()
 # Set linker flags for all builds
 if(WIN32)
   # For Windows systems (MinGW-w64 or MSVC)
-  target_link_options(safe_c PRIVATE -static-libgcc -static-libstdc++)
+  target_link_options(safe_c PRIVATE -static-libgcc -static-libstdc++ -lsafec)
   if(MSVC)
     # For MSVC on Windows
     target_compile_options(safe_c PRIVATE /W4 /WX)
