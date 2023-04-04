@@ -27,6 +27,8 @@ int main() { // main function
   printf("Enter a character: ");
   one_char = sf_getchar();
   printf("The entered character is : %c\n", one_char);
+  strcat(dest, src, MAXBUFF);
+  printf("Final destination string : |%s|", dest);
   return 0;
 }
 

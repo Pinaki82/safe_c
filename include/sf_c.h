@@ -1,4 +1,4 @@
-// Last Change: 2023-04-03  Monday: 12:07:14 AM
+// Last Change: 2023-04-04  Tuesday: 10:55:28 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -262,18 +262,18 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   // Get a pointer to the end of the destination string
   char *dest_end = dest;
 
-  while(*dest_end != '\0' && dest_end - dest < dest_size) {
+  while(*dest_end != '\0' && dest_end - dest < (ptrdiff_t)dest_size) {
     // Find the end of the destination string
     ++dest_end;
   }
 
   // Copy the source string to the end of the destination string
-  while(*src != '\0' && dest_end - dest < dest_size - 1) {
+  while(*src != '\0' && dest_end - dest < (ptrdiff_t)dest_size - 1) {
     *dest_end++ = *src++;
   }
 
   // Add a null terminator to the end of the string
-  if(dest_end - dest < dest_size) {
+  if(dest_end - dest < (ptrdiff_t)dest_size) {
     *dest_end = '\0';
   }
 
