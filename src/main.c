@@ -1,8 +1,8 @@
-// Last Change: 2023-04-04  Tuesday: 09:43:58 PM
+// Last Change: 2023-04-04  Tuesday: 09:45:17 PM
 #include <stdio.h>
 #include "sf_c.h"
 #ifndef  MAXBUFF
-  #define  MAXBUFF  1E+5d
+  #define  MAXBUFF  1E+5f
 #endif
 int main() { // main function
   char dest[14]; // increased size of dest array
