@@ -17,6 +17,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>  // for size_t
 #include <string.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/file-constants?view=msvc-170
 #include <fcntl.h>
@@ -48,6 +49,9 @@ int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len);
 
 // an alternative function to getchar(() that handles input more appropriately
 int sf_getchar(void);
+
+// an alternative function to strcat() that handles input more appropriately
+char *sf_strcat(char *dest, const char *src, size_t dest_size);
 
 
 #ifdef __cplusplus
@@ -197,7 +201,7 @@ int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len) {
   return result;
 }
 
-// an alternative function to getchar(() that handles input more appropriately
+// an alternative function to getchar() that handles input more appropriately
 int sf_getchar(void) {
   static char buf[BUFSIZ];
   static char *bufp = buf;
@@ -215,7 +219,73 @@ int sf_getchar(void) {
   return EOF;
 }
 
+/*
+  #include <stdlib.h> // for NULL
+  #include <stdio.h>  // for fprintf
+  #include <string.h> // for strlen
 
+  The function sf_strcat is an implementation of the strcat function that appends a string to the end of another string, with additional checks to ensure that the operation is performed safely. Here is how the function works:
+
+  It takes three parameters: the destination string dest, the source string src, and the size of the destination buffer dest_size.
+
+  It first gets the length of the destination string using strlen(dest) and stores it in dest_len.
+
+  It then gets the length of the source string using strlen(src) and stores it in src_len.
+
+  The function then checks if there is enough space in the destination buffer to append the source string. If there isn't enough space, the function prints an error message to stderr and returns NULL. This step prevents buffer overflows.
+
+  The function then gets a pointer to the end of the destination string using a loop. The loop starts at the beginning of the destination string and iterates until it finds the null terminator at the end of the string or reaches the end of the buffer.
+
+  The function then copies the source string to the end of the destination string using another loop. The loop starts at the beginning of the source string and iterates until it finds the null terminator at the end of the string or reaches the end of the buffer.
+
+  After the source string has been appended to the destination string, the function adds a null terminator at the end of the string to terminate it properly.
+
+  If the destination buffer is too small to hold the null terminator, the function adds a null terminator at the end of the buffer to prevent buffer overflow.
+
+  Finally, the function returns a pointer to the destination string.
+*/
+
+// an alternative function to strcat() that handles input more appropriately
+char *sf_strcat(char *dest, const char *src, size_t dest_size) {
+  // Get the length of the destination string
+  size_t dest_len = strlen(dest);
+  // Get the length of the source string
+  size_t src_len = strlen(src);
+
+  // Check if there is enough space in the destination buffer to append the source string
+  if(dest_size - (dest_len + 1) <= src_len) {
+    // If there isn't enough space, print an error message to stderr and return NULL
+    fprintf(stderr, "safe_strcat: destination buffer is too small\n");
+    return NULL; // Not enough space in destination buffer
+  }
+
+  // Get a pointer to the end of the destination string
+  char *dest_end = dest;
+
+  while(*dest_end != '\0' && dest_end - dest < dest_size) {
+    // Find the end of the destination string
+    ++dest_end;
+  }
+
+  // Copy the source string to the end of the destination string
+  while(*src != '\0' && dest_end - dest < dest_size - 1) {
+    *dest_end++ = *src++;
+  }
+
+  // Add a null terminator to the end of the string
+  if(dest_end - dest < dest_size) {
+    *dest_end = '\0';
+  }
+
+  else {
+    // If the destination buffer is too small and the null terminator could not be added, add a null terminator at the end of the buffer to prevent buffer overflow.
+    // buffer overflow detected!
+    dest[dest_size - 1] = '\0';
+  }
+
+  // Return a pointer to the destination string
+  return dest;
+}
 
 #define strlen sf_strlen
 #define strcpy sf_strcpy
@@ -224,5 +294,6 @@ int sf_getchar(void) {
 #define scanf sf_scanf
 #define sscanf sf_sscanf
 #define getchar sf_getchar
+#define strcat sf_strcat
 
 
