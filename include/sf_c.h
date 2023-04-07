@@ -1,4 +1,4 @@
-// Last Change: 2023-04-04  Tuesday: 10:55:28 PM
+// Last Change: 2023-04-06  Thursday: 08:54:13 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -21,6 +21,21 @@
 #include <string.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/file-constants?view=msvc-170
 #include <fcntl.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <limits.h>
+
+
+
+#ifdef _WIN32
+  #include  <windows.h>
+#else
+  #include <ncurses.h>
+#endif
+
+
+
+
 
 
 #ifdef __cplusplus
@@ -53,6 +68,24 @@ int sf_getchar(void);
 // an alternative function to strcat() that handles input more appropriately
 char *sf_strcat(char *dest, const char *src, size_t dest_size);
 
+// an alternative function to sprintf() that handles input more appropriately
+char *sf_sprintf(const char *format, ...);
+
+// an alternative function to atoi() that checks for invalid input
+// if(sf_atoi(str, &result) == false) // invalid output = false
+bool sf_atoi(const char *str, int *result);
+
+
+int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
+
+
+
+// clears the screen safely
+#ifdef _WIN32
+void sf_cls(void);
+#else
+void sf_cls(void);
+#endif
 
 #ifdef __cplusplus
 }
@@ -264,7 +297,7 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
 
   while(*dest_end != '\0' && dest_end - dest < (ptrdiff_t)dest_size) {
     // Find the end of the destination string
-    ++dest_end;
+    ++dest_end; // move to the next character in the destination string
   }
 
   // Copy the source string to the end of the destination string
@@ -286,6 +319,178 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   // Return a pointer to the destination string
   return dest;
 }
+
+// an alternative function to sprintf() that handles input more appropriately
+char *sf_sprintf(const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  // Determine the size of the formatted string
+  int size = vsnprintf(NULL, 0, format, args);
+
+  if(size < 0) {
+    // vsnprintf encountered an error
+    va_end(args);
+    return NULL;
+  }
+
+  // Allocate memory for the formatted string
+  char *buffer = (char *) malloc((size_t)(size + 1) * sizeof(char));
+
+  //char *buffer = malloc((size + 1) * sizeof(char));
+
+  if(buffer == NULL) {
+    // Memory allocation failed
+    va_end(args);
+    return NULL;
+  }
+
+  // Write the formatted string to the buffer
+  int written = vsnprintf(buffer, (size_t)(size + 1), format, args);
+  va_end(args);
+
+  if(written < 0 || written > size) {
+    // vsnprintf encountered an error or wrote more characters than expected
+    free(buffer);
+    return NULL;
+  }
+
+  return buffer;
+}
+
+// clears the screen safely
+#ifdef _WIN32  // For Windows
+void sf_cls(void) {
+  HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+  COORD coordScreen = { 0, 0 };    // home for the cursor
+  DWORD cCharsWritten;
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
+  DWORD dwConSize;
+
+  // Get the number of character cells in the current buffer
+  if(!GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+    return;
+  }
+
+  dwConSize = (DWORD)csbi.dwSize.X * (DWORD)csbi.dwSize.Y;
+
+  // Fill the entire screen with spaces
+  if(!FillConsoleOutputCharacter(hConsole, (TCHAR) ' ', dwConSize, coordScreen, &cCharsWritten)) {
+    return;
+  }
+
+  // Move the cursor to the home position
+  SetConsoleCursorPosition(hConsole, coordScreen);
+}
+#else  // For Linux and Mac
+void sf_cls(void) {
+  initscr();
+  clear();
+  refresh();
+  endwin();
+}
+#endif
+
+// an alternative function to atoi() that checks for invalid input
+// if(sf_atoi(str, &result) == false) // invalid output = false
+bool sf_atoi(const char *str, int *result) {
+  long long_val;
+  char *endptr;
+  long_val = strtol(str, &endptr, 10);
+
+  // Check for invalid input or underflow/overflow
+  if(*endptr != '\0' || long_val < INT_MIN || long_val > INT_MAX) {
+    return false;
+  }
+
+  *result = (int)long_val;
+  return true;
+}
+
+
+int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
+  // Ensure that the destination buffer is not null and that its size is at least 1.
+  if(!dest || dest_size < 1) {
+    return -1;
+  }
+
+  // Ensure that the format string is not null.
+  if(!format) {
+    dest[0] = '\0';
+    return 0;
+  }
+
+  // Copy the format string to a new buffer so that we can modify it safely.
+  size_t format_size = strlen(format) + 1;
+  char *new_format = malloc(format_size);
+
+  if(!new_format) {
+    return -1;
+  }
+
+  memcpy(new_format, format, format_size);
+  // Replace all instances of "%.s" with "%.*s" to limit the length of the string argument.
+  char *ptr = new_format;
+
+  while((ptr = strstr(ptr, "%.s")) != NULL) {
+    if(*(ptr + 3) == '.') {
+      ptr += 4;
+    }
+
+    else {
+      size_t offset = ptr - new_format;
+      size_t new_format_size = strlen(new_format) + 3;
+      char *temp = realloc(new_format, new_format_size);
+
+      if(!temp) {
+        free(new_format);
+        return -1;
+      }
+
+      new_format = temp;
+      ptr = new_format + offset;
+      memmove(ptr + 3, ptr + 2, strlen(ptr + 2) + 1);
+      memcpy(ptr, "%.*s", 3);
+      ptr += 3;
+    }
+  }
+
+  // Call vsnprintf with the modified format string.
+  int result = vsnprintf(dest, dest_size, new_format, args);
+  // Free the new format string buffer.
+  free(new_format);
+
+  // Return the number of characters that would have been written if there were enough space.
+  if(result < 0 || (size_t)result >= dest_size) {
+    dest[dest_size - 1] = '\0';
+    return (int)(dest_size - 1);
+  }
+
+  return result;
+}
+
+int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  int result = sf_vsnprintf(dest, dest_size, format, args);
+  va_end(args);
+  return result;
+}
+
+int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  int len = sf_vsnprintf(dest, dest_size, format, args);
+  va_end(args);
+  return len;
+}
+
+
+
+
+
+
+
+
 
 #define strlen sf_strlen
 #define strcpy sf_strcpy

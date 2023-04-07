@@ -1,11 +1,26 @@
-// Last Change: 2023-04-04  Tuesday: 09:45:17 PM
+// Last Change: 2023-04-07  Friday: 03:57:20 PM
 #include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 #include "sf_c.h"
+
 #ifndef  MAXBUFF
   #define  MAXBUFF  1E+5f
 #endif
+
+void writing_out(char *buf, int buf_size, const char *fmt, ...);
+
+void writing_out(char *buf, int buf_size, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  sf_vsnprintf(buf, buf_size, fmt, args);
+  va_end(args);
+}
+
 int main() { // main function
   char dest[14]; // increased size of dest array
+  int calc_out = 0;
   char buffer[100];
   const char *src = "hello";
   size_t n = 5;
@@ -29,6 +44,25 @@ int main() { // main function
   printf("The entered character is : %c\n", one_char);
   strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
+  char *string = sf_sprintf("\n%s %d %f", "sf_sprintf", 42, 3.14);
+
+  if(string == NULL) {
+    printf("Error: safe_sprintf returned NULL\n");
+    return 1;
+  }
+
+  printf("%s\n", string);
+  free(string);
+
+  if(sf_atoi(dest, &calc_out) == false) { // invalid output = false
+    printf("string value = %s, integer value = %d\n", dest, calc_out);
+  }
+
+  char fname[20] = "Bell";
+  char lname[20] = "Laboratory";
+  char lang[5] = "C";
+  writing_out(buffer, 100, "%s was created in %s %s\n", lang, fname, lname);
+  printf("%s", buffer);
   return 0;
 }
 
