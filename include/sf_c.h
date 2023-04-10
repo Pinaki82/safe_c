@@ -1,4 +1,4 @@
-// Last Change: 2023-04-10  Monday: 09:52:37 PM
+// Last Change: 2023-04-10  Monday: 11:34:19 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -24,6 +24,8 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <errno.h>
+#include <ctype.h>
 
 
 
@@ -90,6 +92,40 @@ void sf_cls(void);
 #else
 void sf_cls(void);
 #endif
+
+
+
+
+#define sf_assert(expr) \
+  do { \
+    if (!(expr)) { \
+      fprintf(stderr, "Assertion failed: %s\n", #expr); \
+      errno = EFAULT; \
+      return -1; \
+    } \
+  } while (0)
+
+
+void sf_fflush_out(FILE *stream);
+
+int sf_vfprintf(FILE *stream, const char *format, va_list ap);
+
+
+#ifdef _MSC_VER
+#define strtok(str, delim) _strtok_s(str, delim, NULL)
+#else
+#define strtok(str, delim) strtok_r(str, delim, NULL)
+#endif
+
+
+void sf_puts(const char *s, FILE *stream);
+
+
+
+
+
+
+
 
 #ifdef __cplusplus
 }
@@ -537,7 +573,40 @@ void sf_holdscr(void) {
 #endif
 }
 
+void sf_fflush_out(FILE *stream) {
+  /* TODO: check whether the stream is stdin. If so, return error. */
+  fflush(stream);
+}
 
+
+int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
+  // Check for a null file pointer
+  if(!stream) {
+    return -1;
+  }
+
+  // Call vfprintf() with the given arguments
+  return vfprintf(stream, format, ap);
+}
+
+void sf_puts(const char *s, FILE *stream) {
+  char *sanitized_str = strdup(s);
+
+  if(sanitized_str == NULL) {
+    perror("Error: memory allocation failed");
+    exit(EXIT_FAILURE);
+  }
+
+  // Sanitize the string by replacing non-printable characters with spaces
+  for(size_t i = 0; i < strlen(sanitized_str); i++) {
+    if(!isprint(sanitized_str[i])) {
+      sanitized_str[i] = ' ';
+    }
+  }
+
+  fprintf(stream, "%s\n", sanitized_str);
+  free(sanitized_str);
+}
 
 
 
@@ -553,5 +622,6 @@ void sf_holdscr(void) {
 #define strcat sf_strcat
 #define sf_vsprintf sf_vsnprintf
 #define vsprintf sf_vsnprintf
+#define fflush sf_fflush_out
 
 

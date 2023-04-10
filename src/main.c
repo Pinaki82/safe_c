@@ -87,6 +87,15 @@ int main() { // main function
 
   // holds the screen using the custom function
   sf_holdscr();
+  sf_puts("Hello, world!", stdout); // prints "Hello, world!\n" to stdout
+  sf_puts("Error message!", stderr); // prints "Error message!\n" to stderr
+  int x = 5;
+  sf_assert(x > 10);
+  printf("x is greater than 10\n");
+  printf("This is a test for the fn sf_fflush_out.\n");
+  sf_fflush_out(stdout); // Ensure output is written immediately
+  fprintf(stderr, "Error message.\n");
+  sf_fflush_out(stderr); // Ensure output is written immediately
   return 0;
 }
 
