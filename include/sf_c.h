@@ -1,4 +1,4 @@
-// Last Change: 2023-04-06  Thursday: 08:54:13 PM
+// Last Change: 2023-04-10  Monday: 08:30:11 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -75,10 +75,48 @@ char *sf_sprintf(const char *format, ...);
 // if(sf_atoi(str, &result) == false) // invalid output = false
 bool sf_atoi(const char *str, int *result);
 
+/*
+   sf_vsnprintf - Safely format a variable argument list to a string buffer with size checking.
 
+   This function formats the variable argument list according to the provided format string and writes the resulting string
+   to the provided destination buffer, ensuring that the buffer is not overflowed. The size of the destination buffer
+   must be specified, and the function returns the number of characters that would have been written if there were enough
+   space. If an error occurs, the function returns a negative value.
+
+   Parameters:
+       dest - A pointer to the destination buffer to which the formatted string will be written.
+       dest_size - The size of the destination buffer, in bytes.
+       format - A format string that specifies how the variable argument list should be formatted.
+       args - A variable argument list that contains the values to be formatted.
+
+   Returns:
+       The number of characters that would have been written if there were enough space, excluding the null terminating
+       character. If an error occurs, a negative value is returned.
+*/
+
+// A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
+/*
+   A safe version of `sscanf()` that ensures the buffer is not null and its size
+   is at least one, and also checks for invalid inputs.
 
+   Parameters:
+    str: The input string to parse
+    str_size: The size of the input string buffer
+    format: The format string specifying the expected format of the input
+    ...: The variables to store the parsed input values
+
+   Returns:
+    The number of input items successfully matched and assigned, or EOF if an
+    error occurred.
+*/
+
+// Safe version of sscanf(), ensuring destination buffer is not null and size is at least 1.
+int sf_sscanf(const char *str, size_t str_size, const char *format, ...);
+
+// function: holds the screen before the text disappears
+void sf_holdscr(void);
 
 // clears the screen safely
 #ifdef _WIN32
@@ -92,6 +130,16 @@ void sf_cls(void);
 #endif
 
 #endif  /* __SF_C_H__ */
+
+/* Non-global prototypes */
+
+/* A backup function for sprintf() that uses the safe version of vsnprintf(). */
+int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...);
+
+/* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
+int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
+
+/* Fn definitions start here */
 
 // an alternative function to strlen() that checks buffer size as an argument
 // Based on // https://stackoverflow.com/questions/5935413/is-there-a-safe-version-of-strlen
@@ -406,7 +454,26 @@ bool sf_atoi(const char *str, int *result) {
   return true;
 }
 
+/*
+   sf_vsnprintf - Safely format a variable argument list to a string buffer with size checking.
 
+   This function formats the variable argument list according to the provided format string and writes the resulting string
+   to the provided destination buffer, ensuring that the buffer is not overflowed. The size of the destination buffer
+   must be specified, and the function returns the number of characters that would have been written if there were enough
+   space. If an error occurs, the function returns a negative value.
+
+   Parameters:
+       dest - A pointer to the destination buffer to which the formatted string will be written.
+       dest_size - The size of the destination buffer, in bytes.
+       format - A format string that specifies how the variable argument list should be formatted.
+       args - A variable argument list that contains the values to be formatted.
+
+   Returns:
+       The number of characters that would have been written if there were enough space, excluding the null terminating
+       character. If an error occurs, a negative value is returned.
+*/
+
+// A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
   // Ensure that the destination buffer is not null and that its size is at least 1.
   if(!dest || dest_size < 1) {
@@ -421,7 +488,7 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
 
   // Copy the format string to a new buffer so that we can modify it safely.
   size_t format_size = strlen(format) + 1;
-  char *new_format = malloc(format_size);
+  char *new_format = (char *)malloc(format_size * sizeof(char));
 
   if(!new_format) {
     return -1;
@@ -437,9 +504,9 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
     }
 
     else {
-      size_t offset = ptr - new_format;
+      size_t offset = (size_t)(ptr - new_format);
       size_t new_format_size = strlen(new_format) + 3;
-      char *temp = realloc(new_format, new_format_size);
+      char *temp = (char *)realloc(new_format, new_format_size);
 
       if(!temp) {
         free(new_format);
@@ -468,6 +535,7 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
   return result;
 }
 
+/* A backup function for sprintf() that uses the safe version of vsnprintf(). */
 int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -476,6 +544,7 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
   return result;
 }
 
+/* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -484,7 +553,51 @@ int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...
   return len;
 }
 
+/*
+   A safe version of `sscanf()` that ensures the buffer is not null and its size
+   is at least one, and also checks for invalid inputs.
 
+   Parameters:
+    str: The input string to parse
+    str_size: The size of the input string buffer
+    format: The format string specifying the expected format of the input
+    ...: The variables to store the parsed input values
+
+   Returns:
+    The number of input items successfully matched and assigned, or EOF if an
+    error occurred.
+*/
+
+// Safe version of sscanf(), ensuring destination buffer is not null and size is at least 1.
+int sf_sscanf(const char *str, size_t str_size, const char *format, ...) {
+  if(str == NULL || str_size == 0) {
+    return EOF;
+  }
+
+  va_list args;
+  va_start(args, format);
+  int result = vsscanf(str, format, args);
+  va_end(args);
+
+  if(result == EOF || (size_t)result > str_size) {
+    return EOF;
+  }
+
+  return result;
+}
+
+// function: holds the screen before the text disappears
+void sf_holdscr(void) {
+#ifdef _WIN32
+  system("pause >nul"); // pause >nul redirects the output of the pause command to nul to suppress the "Press any key to continue . . ." message.
+#else
+  /* prints a message to the console, flushes the buffer, and then reads a single character from the user input without echoing it to the terminal using the read command. Finally, it prints a newline character to ensure the cursor is on a new line before continuing. */
+  printf("Press any key to continue...");
+  fflush(stdout);
+  system("read -rsn1"); // Linux. command explanation: `read` was used to read from stdin, `-p` means that the user will be prompted for input.  // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+  printf("\n");
+#endif
+}
 
 
 
@@ -500,5 +613,7 @@ int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...
 #define sscanf sf_sscanf
 #define getchar sf_getchar
 #define strcat sf_strcat
+#define sf_vsprintf sf_vsnprintf
+#define vsprintf sf_vsnprintf
 
 

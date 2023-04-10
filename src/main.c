@@ -1,4 +1,4 @@
-// Last Change: 2023-04-07  Friday: 03:57:20 PM
+// Last Change: 2023-04-10  Monday: 08:42:23 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@ void writing_out(char *buf, int buf_size, const char *fmt, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
-  sf_vsnprintf(buf, buf_size, fmt, args);
+  sf_vsnprintf(buf, (size_t)buf_size, fmt, args);
   va_end(args);
 }
 
@@ -63,6 +63,30 @@ int main() { // main function
   char lang[5] = "C";
   writing_out(buffer, 100, "%s was created in %s %s\n", lang, fname, lname);
   printf("%s", buffer);
+  int option; /* Options */
+  printf("Please choose an option:\n");
+  printf("1. Clear the screen.\n");
+  printf("2. Keep the screen as it is.\n");
+  scanf_s("%d", &option);
+
+  if(option == 1) {
+    // Code to execute if Option One was chosen
+    printf("Clearing the screen.\n");
+    sf_cls();
+  }
+
+  else if(option == 2) {
+    // Code to execute if Option Two was chosen
+    printf("Keeping the screen as it is.\n");
+  }
+
+  else {
+    // Code to execute if an invalid option was chosen
+    printf("Invalid option chosen.\n");
+  }
+
+  // holds the screen using the custom function
+  sf_holdscr();
   return 0;
 }
 
