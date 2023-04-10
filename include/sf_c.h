@@ -1,4 +1,4 @@
-// Last Change: 2023-04-10  Monday: 08:30:11 PM
+// Last Change: 2023-04-10  Monday: 09:52:37 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -75,45 +75,11 @@ char *sf_sprintf(const char *format, ...);
 // if(sf_atoi(str, &result) == false) // invalid output = false
 bool sf_atoi(const char *str, int *result);
 
-/*
-   sf_vsnprintf - Safely format a variable argument list to a string buffer with size checking.
-
-   This function formats the variable argument list according to the provided format string and writes the resulting string
-   to the provided destination buffer, ensuring that the buffer is not overflowed. The size of the destination buffer
-   must be specified, and the function returns the number of characters that would have been written if there were enough
-   space. If an error occurs, the function returns a negative value.
-
-   Parameters:
-       dest - A pointer to the destination buffer to which the formatted string will be written.
-       dest_size - The size of the destination buffer, in bytes.
-       format - A format string that specifies how the variable argument list should be formatted.
-       args - A variable argument list that contains the values to be formatted.
-
-   Returns:
-       The number of characters that would have been written if there were enough space, excluding the null terminating
-       character. If an error occurs, a negative value is returned.
-*/
-
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
-/*
-   A safe version of `sscanf()` that ensures the buffer is not null and its size
-   is at least one, and also checks for invalid inputs.
-
-   Parameters:
-    str: The input string to parse
-    str_size: The size of the input string buffer
-    format: The format string specifying the expected format of the input
-    ...: The variables to store the parsed input values
-
-   Returns:
-    The number of input items successfully matched and assigned, or EOF if an
-    error occurred.
-*/
-
-// Safe version of sscanf(), ensuring destination buffer is not null and size is at least 1.
-int sf_sscanf(const char *str, size_t str_size, const char *format, ...);
+// an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
+int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len);
 
 // function: holds the screen before the text disappears
 void sf_holdscr(void);
@@ -262,8 +228,13 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   return result;
 }
 
-// an alternative function to sscanf() that checks buffer size as an argument
+// an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
 int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len) {
+  if(str == NULL || format == NULL || arg == NULL) {
+    // Invalid input
+    return EOF;
+  }
+
   // Allocate memory for a copy of the string
   char *str_copy = (char *)malloc(max_len + 1);
 
@@ -551,39 +522,6 @@ int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...
   int len = sf_vsnprintf(dest, dest_size, format, args);
   va_end(args);
   return len;
-}
-
-/*
-   A safe version of `sscanf()` that ensures the buffer is not null and its size
-   is at least one, and also checks for invalid inputs.
-
-   Parameters:
-    str: The input string to parse
-    str_size: The size of the input string buffer
-    format: The format string specifying the expected format of the input
-    ...: The variables to store the parsed input values
-
-   Returns:
-    The number of input items successfully matched and assigned, or EOF if an
-    error occurred.
-*/
-
-// Safe version of sscanf(), ensuring destination buffer is not null and size is at least 1.
-int sf_sscanf(const char *str, size_t str_size, const char *format, ...) {
-  if(str == NULL || str_size == 0) {
-    return EOF;
-  }
-
-  va_list args;
-  va_start(args, format);
-  int result = vsscanf(str, format, args);
-  va_end(args);
-
-  if(result == EOF || (size_t)result > str_size) {
-    return EOF;
-  }
-
-  return result;
 }
 
 // function: holds the screen before the text disappears
