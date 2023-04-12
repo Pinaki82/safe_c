@@ -127,6 +127,8 @@ int sf_putchar(int c);
 
 int sf_getc(FILE *stream, char *buffer, size_t buflen);
 
+void *sf_memcpy(void *to, const void *from, size_t numBytes);
+
 
 #ifdef __cplusplus
 }
@@ -654,6 +656,9 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
   return sf_getc(stream, buffer, buflen);
 }
 
+void *sf_memcpy(void *to, const void *from, size_t numBytes) {
+  return memmove(to, from, numBytes);
+}
 
 
 
