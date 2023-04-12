@@ -14,6 +14,7 @@
   #define BUFSIZ 1024
 #endif
 
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -120,11 +121,11 @@ int sf_vfprintf(FILE *stream, const char *format, va_list ap);
 
 void sf_puts(const char *s, FILE *stream);
 
+int sf_putc(int c, FILE *stream);
 
+int sf_putchar(int c);
 
-
-
-
+int sf_getc(FILE *stream, char *buffer, size_t buflen);
 
 
 #ifdef __cplusplus
@@ -140,6 +141,8 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
 
 /* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
+
+int is_valid_input_char(char c);
 
 /* Fn definitions start here */
 
@@ -607,6 +610,58 @@ void sf_puts(const char *s, FILE *stream) {
   fprintf(stream, "%s\n", sanitized_str);
   free(sanitized_str);
 }
+
+int sf_putc(int c, FILE *stream) {
+  if(!isprint(c)) {
+    fprintf(stderr, "Error: Non-printable character detected in input.\n");
+    return EOF;
+  }
+
+  return fputc(c, stream);
+}
+
+int sf_putchar(int c) {
+  if(!isprint(c) || c == '\n' || c == '\r' || c == '\t') {
+    return EOF;  // reject non-printable characters and control characters
+  }
+
+  return putchar(c);  // safe to write to stdout
+}
+
+int is_valid_input_char(char c) {
+  return isprint((unsigned char) c);
+}
+
+int sf_getc(FILE *stream, char *buffer, size_t buflen) {
+  if(!buffer || buflen == 0) {
+    return EOF;
+  }
+
+  int c = getc(stream);
+
+  if(c == EOF) {
+    buffer[0] = '\0';
+    return EOF;
+  }
+
+  if(is_valid_input_char(c)) {
+    buffer[0] = (char) c;
+    buffer[1] = '\0';
+    return c;
+  }
+
+  buffer[0] = '\0';
+  return sf_getc(stream, buffer, buflen);
+}
+
+
+
+
+
+
+
+
+
 
 
 

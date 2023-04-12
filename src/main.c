@@ -89,6 +89,29 @@ int main() { // main function
   sf_holdscr();
   sf_puts("Hello, world!", stdout); // prints "Hello, world!\n" to stdout
   sf_puts("Error message!", stderr); // prints "Error message!\n" to stderr
+  FILE *pFile;
+  int c;
+  int n2 = 0;
+  char buff2[1024];
+  pFile = fopen("myfile.txt", "r");
+
+  if(pFile == NULL) {
+    perror("Error opening file");
+  }
+
+  else {
+    do {
+      c = sf_getc(pFile, buff2, sizeof(buff2));
+
+      if(c == 'r') {
+        n2++;
+      }
+    } while(c != EOF);
+
+    fclose(pFile);
+    printf("File contains %d r.\n", n2);
+  }
+
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
