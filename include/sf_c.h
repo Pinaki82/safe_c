@@ -1,4 +1,4 @@
-// Last Change: 2023-04-10  Monday: 11:34:19 PM
+// Last Change: 2023-04-13  Thursday: 02:33:34 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -646,7 +646,7 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
     return EOF;
   }
 
-  if(is_valid_input_char(c)) {
+  if(is_valid_input_char((char)c)) {
     buffer[0] = (char) c;
     buffer[1] = '\0';
     return c;
