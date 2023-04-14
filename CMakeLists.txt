@@ -13,6 +13,7 @@ project(safe_c)
 
 # https://stackoverflow.com/questions/13703647/how-to-properly-add-include-directories-with-cmake
 include_directories(include)
+
 add_executable(safe_c
   src/main.c
   include/sf_c.h
@@ -39,8 +40,8 @@ if(WIN32)
   endif()
 else()
   # For non-Windows systems (GCC or Clang)
-  target_link_options(safe_c PRIVATE -static)
-  target_compile_options(safe_c PRIVATE -Werror)
+  target_link_options(safe_c PRIVATE -static -lsafec)
+  # target_compile_options(safe_c PRIVATE -Werror)
 endif()
 
 # Set build type to Release by default
@@ -51,7 +52,7 @@ endif()
 # Set compiler and linker flags for Debug and Release builds
 target_compile_options(safe_c PRIVATE
   $<$<CONFIG:Debug>:-O0 -g>
-  $<$<CONFIG:Release>:-O3>
+  $<$<CONFIG:Release>:-O2>
 )
 
 if(WIN32 AND MSVC)

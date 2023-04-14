@@ -1,4 +1,4 @@
-// Last Change: 2023-04-13  Thursday: 02:33:34 AM
+// Last Change: 2023-04-14  Friday: 05:39:23 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -27,6 +27,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
+#include <unistd.h>
 
 
 
@@ -595,7 +596,7 @@ int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
 }
 
 void sf_puts(const char *s, FILE *stream) {
-  char *sanitized_str = strdup(s);
+  char *sanitized_str = strndup(s, (size_t) strlen(s));
 
   if(sanitized_str == NULL) {
     perror("Error: memory allocation failed");
@@ -612,6 +613,8 @@ void sf_puts(const char *s, FILE *stream) {
   fprintf(stream, "%s\n", sanitized_str);
   free(sanitized_str);
 }
+
+
 
 int sf_putc(int c, FILE *stream) {
   if(!isprint(c)) {
