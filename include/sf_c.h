@@ -516,7 +516,7 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
     return -1;
   }
 
-  memcpy(new_format, format, format_size);
+  memmove(new_format, format, format_size);
   // Replace all instances of "%.s" with "%.*s" to limit the length of the string argument.
   char *ptr = new_format;
 
@@ -538,7 +538,7 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
       new_format = temp;
       ptr = new_format + offset;
       memmove(ptr + 3, ptr + 2, strlen(ptr + 2) + 1);
-      memcpy(ptr, "%.*s", 3);
+      memmove(ptr, "%.*s", 3);
       ptr += 3;
     }
   }
@@ -687,7 +687,7 @@ char *strdup(const char *s) {
   }
 
   if(p != NULL) {
-    memcpy(p, s, size);
+    memmove(p, s, size);
   }
 
   else {
@@ -714,7 +714,7 @@ char *strndup(const char *s, size_t n) {
   }
 
   if(p != NULL) {
-    memcpy(p, s, n1);
+    memmove(p, s, n1);
     p[n1] = '\0';
   }
 
