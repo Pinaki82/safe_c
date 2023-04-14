@@ -1,0 +1,5 @@
+The functions strdup and strndup are not yet part of Standard C.
+They are standardized in Posix.1-2008 and declared in <string.h> on Posix systems.
+Did you include <string.h>?
+
+If your system does not provide these functions, you can define them yourself this way:

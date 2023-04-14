@@ -93,7 +93,7 @@ int main() { // main function
   int c;
   int n2 = 0;
   char buff2[1024];
-  pFile = fopen("myfile.txt", "r");
+  pFile = fopen("../testfile.txt", "r");
 
   if(pFile == NULL) {
     perror("Error opening file");

@@ -1,4 +1,4 @@
-// Last Change: 2023-04-14  Friday: 05:39:23 PM
+// Last Change: 2023-04-14  Friday: 10:59:47 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -131,6 +131,9 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen);
 void *sf_memcpy(void *to, const void *from, size_t numBytes);
 
 
+
+
+
 #ifdef __cplusplus
 }
 #endif
@@ -146,6 +149,9 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
 
 int is_valid_input_char(char c);
+
+char *strdup(const char *s);
+char *strndup(const char *s, size_t n);
 
 /* Fn definitions start here */
 
@@ -663,8 +669,57 @@ void *sf_memcpy(void *to, const void *from, size_t numBytes) {
   return memmove(to, from, numBytes);
 }
 
+/* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
 
+char *strdup(const char *s) {
+  size_t size = strlen(s) + 1;
+  char *p;
+  p = (char *)malloc((size_t)(size) * sizeof(char));
 
+  if(p == NULL) {
+    fprintf(stderr, "\ndynamic memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if(p != NULL) {
+    memcpy(p, s, size);
+  }
+
+  else {
+    free(p);
+    p = NULL;
+  }
+
+  return p;
+}
+
+char *strndup(const char *s, size_t n) {
+  char *p;
+  size_t n1;
+
+  for(n1 = 0; n1 < n && s[n1] != '\0'; n1++) {
+    continue;
+  }
+
+  p = (char *)malloc((size_t)(n + 1) * sizeof(char));
+
+  if(p == NULL) {
+    fprintf(stderr, "\ndynamic memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if(p != NULL) {
+    memcpy(p, s, n1);
+    p[n1] = '\0';
+  }
+
+  else {
+    free(p);
+    p = NULL;
+  }
+
+  return p;
+}
 
 
 
