@@ -614,10 +614,10 @@ void sf_puts(const char *s, FILE *stream) {
   }
 
   // Copy the string to sanitized_str and sanitize it
-  strncpy(sanitized_str, s, len);
+  strncpy(sanitized_str, s, (len + 1));
   sanitized_str[len] = '\0';
 
-  for(size_t i = 0; i < len; i++) {
+  for(size_t i = 0; i < (len + 1); i++) {
     if(!isprint(sanitized_str[i])) {
       sanitized_str[i] = ' ';
     }
