@@ -1,4 +1,4 @@
-// Last Change: 2023-04-14  Friday: 10:59:47 PM
+// Last Change: 2023-04-15  Saturday: 12:24:38 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -130,6 +130,9 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen);
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes);
 
+char *sf_fgets(char *s, int size, FILE *stream);
+
+int sf_fscanf(FILE *stream, const char *format, int buffer_size, char *buffer, ...);
 
 
 
@@ -602,15 +605,19 @@ int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
 }
 
 void sf_puts(const char *s, FILE *stream) {
-  char *sanitized_str = strndup(s, (size_t) strlen(s));
+  size_t len = strlen(s);
+  char *sanitized_str = (char *)malloc((len + 1) * sizeof(char));
 
   if(sanitized_str == NULL) {
     perror("Error: memory allocation failed");
     exit(EXIT_FAILURE);
   }
 
-  // Sanitize the string by replacing non-printable characters with spaces
-  for(size_t i = 0; i < strlen(sanitized_str); i++) {
+  // Copy the string to sanitized_str and sanitize it
+  strncpy(sanitized_str, s, len);
+  sanitized_str[len] = '\0';
+
+  for(size_t i = 0; i < len; i++) {
     if(!isprint(sanitized_str[i])) {
       sanitized_str[i] = ' ';
     }
@@ -619,8 +626,6 @@ void sf_puts(const char *s, FILE *stream) {
   fprintf(stream, "%s\n", sanitized_str);
   free(sanitized_str);
 }
-
-
 
 int sf_putc(int c, FILE *stream) {
   if(!isprint(c)) {
@@ -721,7 +726,68 @@ char *strndup(const char *s, size_t n) {
   return p;
 }
 
+int sf_fscanf(FILE *stream, const char *format, int buffer_size, char *buffer, ...) {
+  int result;
 
+  if(buffer_size <= 0) {
+    fprintf(stderr, "Error: Invalid buffer size\n");
+    return EOF;
+  }
+
+  // Allocate memory for temporary buffer
+  char *tmp_buffer = (char *)malloc((size_t)buffer_size * sizeof(char));
+
+  if(tmp_buffer == NULL) {
+    fprintf(stderr, "Error: Memory allocation failed\n");
+    return EOF;
+  }
+
+  // Read input into temporary buffer
+  if(sf_fgets(tmp_buffer, buffer_size, stream) == NULL) {
+    free(tmp_buffer);
+    return EOF;
+  }
+
+  // Scan input from temporary buffer into output buffer
+  va_list args;
+  va_start(args, buffer);
+  result = vsscanf(tmp_buffer, format, args);
+  va_end(args);
+  // Copy contents of temporary buffer to output buffer
+  strncpy(buffer, tmp_buffer, (size_t)buffer_size);
+  buffer[buffer_size - 1] = '\0';
+  free(tmp_buffer);
+  return result;
+}
+
+char *sf_fgets(char *s, int size, FILE *stream) {
+  if(size <= 0) {
+    fprintf(stderr, "Error: Invalid buffer size.\n");
+    return NULL;
+  }
+
+  char *ret = fgets(s, size, stream);
+
+  if(ret == NULL) {
+    return ret;
+  }
+
+  // Remove the newline character at the end, if present
+  size_t len = strlen(s);
+
+  if(len > 0 && s[len - 1] == '\n') {
+    s[len - 1] = '\0';
+  }
+
+  // Sanitize the string by replacing non-printable characters with spaces
+  for(size_t i = 0; i < len; i++) {
+    if(!isprint(s[i])) {
+      s[i] = ' ';
+    }
+  }
+
+  return ret;
+}
 
 
 
