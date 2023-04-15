@@ -63,9 +63,6 @@ char *sf_gets(char *str, int size, FILE *stream);
 // an alternative function to scanf() that checks buffer size as an argument
 int sf_scanf(char *format, void *arg, size_t max_len);
 
-// an alternative function to sscanf() that checks buffer size as an argument
-int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len);
-
 // an alternative function to getchar(() that handles input more appropriately
 int sf_getchar(void);
 
@@ -130,9 +127,14 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen);
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes);
 
+char *strdup(const char *s);
+
+char *strndup(const char *s, size_t n);
+
 char *sf_fgets(char *s, int size, FILE *stream);
 
 int sf_fscanf(FILE *stream, const char *format, int buffer_size, char *buffer, ...);
+
 
 
 
@@ -152,9 +154,6 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
 
 int is_valid_input_char(char c);
-
-char *strdup(const char *s);
-char *strndup(const char *s, size_t n);
 
 /* Fn definitions start here */
 
