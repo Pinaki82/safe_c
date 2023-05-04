@@ -80,6 +80,9 @@ bool sf_atoi(const char *str, int *result);
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
+// A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
+int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
+
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
 int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len);
 
@@ -576,6 +579,30 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
   return result;
 }
 
+/*
+   sf_vsprintf - Safely format a variable argument list to a string buffer with size checking.
+
+   This function formats the variable argument list according to the provided format string and writes the resulting string
+   to the provided destination buffer, ensuring that the buffer is not overflowed. The size of the destination buffer
+   must be specified, and the function returns the number of characters that would have been written if there were enough
+   space. If an error occurs, the function returns a negative value.
+
+   Parameters:
+       dest - A pointer to the destination buffer to which the formatted string will be written.
+       dest_size - The size of the destination buffer, in bytes.
+       format - A format string that specifies how the variable argument list should be formatted.
+       args - A variable argument list that contains the values to be formatted.
+
+   Returns:
+       The number of characters that would have been written if there were enough space, excluding the null terminating
+       character. If an error occurs, a negative value is returned.
+*/
+
+// A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
+int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args) {
+  return sf_vsnprintf(dest, dest_size, format, args);
+}
+
 /* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...) {
   va_list args;
@@ -909,7 +936,7 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
 #define sscanf sf_sscanf
 #define getchar sf_getchar
 #define strcat sf_strcat
-#define sf_vsprintf sf_vsnprintf
-#define vsprintf sf_vsnprintf
+#define vsnprintf sf_vsnprintf
+#define vsprintf sf_vsprintf
 #define fflush sf_fflush_out
 
