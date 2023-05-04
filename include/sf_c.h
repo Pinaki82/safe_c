@@ -821,12 +821,12 @@ errno_t sf_memset(
 int *create_delim_dict(const char *delim, size_t max_len) {
   int *d = (int *)malloc(sizeof(int) * DICT_LEN);
 
-  for(int j = 0; j < DICT_LEN; j++) { // initialisation: fill the allocated memorym with zeros before using it
-    *(d + j) = 0; // initialize the allocated array with zeros
-  }
-
   if(!d) {
     return NULL;
+  }
+
+  for(int j = 0; j < DICT_LEN; j++) { // initialisation: fill the allocated memorym with zeros before using it
+    *(d + j) = 0; // initialize the allocated array with zeros
   }
 
   sf_memset((void *)d, sizeof(int)*DICT_LEN, 0, sizeof(int)*DICT_LEN);
