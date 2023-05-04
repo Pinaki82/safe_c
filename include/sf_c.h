@@ -1,4 +1,4 @@
-// Last Change: 2023-05-04  Thursday: 07:31:53 PM
+// Last Change: 2023-05-04  Thursday: 08:23:53 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -505,11 +505,12 @@ bool sf_atoi(const char *str, int *result) {
    Returns:
        The number of characters that would have been written if there were enough space, excluding the null terminating
        character. If an error occurs, a negative value is returned.
+
+    Refer to https://en.cppreference.com/w/c/io/vfprintf for more info.
 */
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  /* TODO: Wrap vsprintf */
   // Ensure that the destination buffer is not null and that its size is at least 1.
   if(!dest || dest_size < 1) {
     return -1;
