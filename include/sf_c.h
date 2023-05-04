@@ -825,7 +825,7 @@ int *create_delim_dict(const char *delim, size_t max_len) {
     return NULL;
   }
 
-  for(int j = 0; j < DICT_LEN; j++) { // initialisation: fill the allocated memorym with zeros before using it
+  for(int j = 0; j < DICT_LEN; j++) { // initialisation: fill the allocated memory with zeros before using it
     *(d + j) = 0; // initialize the allocated array with zeros
   }
 
