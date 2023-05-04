@@ -1,4 +1,4 @@
-// Last Change: 2023-04-13  Thursday: 02:31:48 AM
+// Last Change: 2023-05-04  Thursday: 08:35:24 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -9,7 +9,27 @@
   #define  MAXBUFF  1E+5f
 #endif
 
+void vsprintf_test(char const *const format, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...);
+
+void vsprintf_test(char const *const format, ...) {
+  //https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/vsprintf-s-vsprintf-s-l-vswprintf-s-vswprintf-s-l?view=msvc-170
+  va_list args;
+  int len;
+  char *buffer;
+  va_start(args, format);
+  len = _vscprintf(format, args)   // _vscprintf doesn't count
+        + 1; // terminating '\0'
+  buffer = (char *) malloc((size_t)len * sizeof(char));
+
+  if(NULL != buffer) {
+    sf_vsprintf(buffer, (size_t)len, format, args);
+    puts(buffer);
+    free(buffer);
+  }
+
+  va_end(args);
+}
 
 void writing_out(char *buf, int buf_size, const char *fmt, ...) {
   va_list args;
@@ -135,6 +155,8 @@ int main() { // main function
     token = sf_strtok(NULL, s, sizeof(str));
   }
 
+  vsprintf_test("%d %c %d", 123, '<', 456);
+  vsprintf_test("%s", "This is a string");
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
