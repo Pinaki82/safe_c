@@ -22,10 +22,10 @@ int main() { // main function
   char dest[14]; // increased size of dest array
   int calc_out = 0;
   char buffer[100];
-  const char *src = "hello";
+  const char *src = "Hello";
   size_t n = 5;
   int one_char;
-  sf_strcpy(dest, "Hello, world!", sizeof(dest));
+  sf_strcpy(dest, "Hello, safety!", sizeof(dest));
   printf("%s\n", dest);
   sf_strncpy(dest, src, n);
   printf("%s\n", dest);
@@ -87,7 +87,7 @@ int main() { // main function
 
   // holds the screen using the custom function
   sf_holdscr();
-  sf_puts("Hello, world!", stdout); // prints "Hello, world!\n" to stdout
+  sf_puts("Hello, Safety! puts", stdout); // prints "Hello, Safety!\n" to stdout
   sf_puts("Error message!", stderr); // prints "Error message!\n" to stderr
   FILE *pFile;
   int c;
@@ -110,6 +110,29 @@ int main() { // main function
 
     fclose(pFile);
     printf("File contains %d r.\n", n2);
+  }
+
+  char str2split[480] = "Wikipedia: Dark matter is a hypothetical form of matter thought to account for approximately 85% of the matter in the universe. Dark matter is called \"dark\" because it does not appear to interact with the electromagnetic field, which means it does not absorb, reflect, or emit electromagnetic radiation and is, therefore, difficult to detect. Most experts think that dark matter is abundant in the universe and has had a strong influence on its structure and evolution.";
+  const char splitter[2] = ".";
+  char *token;
+  /* get the first token */
+  token = sf_strtok(str2split, splitter, 500);
+
+  /* walk through other tokens */
+  while(token != NULL) {
+    printf(" %s!!!\n", token);
+    token = sf_strtok(NULL, splitter, 500);
+  }
+
+  char str[] = "apple,banana,carrot";
+  const char s[2] = ",";
+  //char *token2, k = '\0';
+  //token2 = &k;
+  token = sf_strtok(str, s, sizeof(str));
+
+  while(token != NULL) {
+    printf(" %s\n", token);
+    token = sf_strtok(NULL, s, sizeof(str));
   }
 
   int x = 5;

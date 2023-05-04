@@ -1,4 +1,4 @@
-// Last Change: 2023-04-15  Saturday: 12:24:38 AM
+// Last Change: 2023-05-04  Thursday: 02:42:15 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -14,6 +14,7 @@
   #define BUFSIZ 1024
 #endif
 
+#define DICT_LEN 256 // needed by create_delim_dict()
 
 #include <math.h>
 #include <stdio.h>
@@ -135,7 +136,14 @@ char *sf_fgets(char *s, int size, FILE *stream);
 
 int sf_fscanf(FILE *stream, const char *format, int buffer_size, char *buffer, ...);
 
+char *sf_strtok(char *str, const char *delim, size_t max_len);
 
+errno_t sf_memset(
+        void *dest,
+        size_t destSize,
+        int value,
+        size_t count
+);
 
 
 
@@ -154,6 +162,8 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
 
 int is_valid_input_char(char c);
+
+int *create_delim_dict(const char *delim, size_t max_len);
 
 /* Fn definitions start here */
 
@@ -496,6 +506,7 @@ bool sf_atoi(const char *str, int *result) {
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
+  /* TODO: Wrap vsprintf */
   // Ensure that the destination buffer is not null and that its size is at least 1.
   if(!dest || dest_size < 1) {
     return -1;
@@ -604,7 +615,7 @@ int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
 }
 
 void sf_puts(const char *s, FILE *stream) {
-  size_t len = strlen(s);
+  size_t len = sf_strlen(s, MAXBUFF);
   char *sanitized_str = (char *)malloc((len + 1) * sizeof(char));
 
   if(sanitized_str == NULL) {
@@ -613,8 +624,8 @@ void sf_puts(const char *s, FILE *stream) {
   }
 
   // Copy the string to sanitized_str and sanitize it
-  strncpy(sanitized_str, s, (len + 1));
-  sanitized_str[len] = '\0';
+  sf_strncpy(sanitized_str, s, (len + 1));
+  sanitized_str[len + 1] = '\0';
 
   for(size_t i = 0; i < (len + 1); i++) {
     if(!isprint(sanitized_str[i])) {
@@ -788,7 +799,102 @@ char *sf_fgets(char *s, int size, FILE *stream) {
   return ret;
 }
 
+errno_t sf_memset(
+        void *dest,
+        size_t destSize,
+        int value,
+        size_t count
+) {
+  if(dest == NULL || destSize == 0 || count > destSize) {
+    return EINVAL;
+  }
 
+  volatile unsigned char *p = (volatile unsigned char *)dest;
+
+  while(count--) {
+    *p++ = (unsigned char)value;
+  }
+
+  return 0;
+}
+
+int *create_delim_dict(const char *delim, size_t max_len) {
+  int *d = (int *)malloc(sizeof(int) * DICT_LEN);
+
+  for(int j = 0; j < DICT_LEN; j++) { // initialisation: fill the allocated memorym with zeros before using it
+    *d = 0; // initialize the allocated array with zeros
+  }
+
+  if(!d) {
+    return NULL;
+  }
+
+  sf_memset((void *)d, sizeof(int)*DICT_LEN, 0, sizeof(int)*DICT_LEN);
+  int i = 0;
+
+  for(i = 0; i < (int)sf_strlen(delim, max_len); i++) {
+    d[(unsigned char)delim[i]] = 1;
+  }
+
+  return d;
+}
+
+char *sf_strtok(char *str, const char *delim, size_t max_len) {
+  static char *last_token, *to_free;
+  int *deli_dict = create_delim_dict(delim, max_len);
+
+  if(!deli_dict || !max_len) {
+    if(to_free) {
+      free(to_free);
+      to_free = NULL;
+    }
+
+    return NULL;
+  }
+
+  if(str) {
+    last_token = (char *)malloc(max_len + 1);
+
+    if(!last_token) {
+      free(deli_dict);
+      deli_dict = NULL;
+      return NULL;
+    }
+
+    to_free = last_token;
+    sf_strncpy(last_token, str, max_len); /* FIXME: strncpy(). insecure function */
+    last_token[max_len] = '\0';
+  }
+
+  while(deli_dict[(unsigned char)*last_token] && *last_token != '\0') { //https://stackoverflow.com/questions/9972359/warning-array-subscript-has-type-char
+    last_token++;
+  }
+
+  str = last_token;
+
+  if(*last_token == '\0') {
+    free(deli_dict);
+    deli_dict = NULL;
+    free(to_free);
+    to_free = NULL;
+    return NULL;
+  }
+
+  while(*last_token != '\0' && !deli_dict[(unsigned char)*last_token]) {
+    last_token++;
+  }
+
+  if(*last_token != '\0') {
+    *last_token++ = '\0';
+  }
+
+  if(deli_dict) {
+    free(deli_dict);
+    deli_dict = NULL;
+  }
+
+  return (char *)str;
+}
 
 
 
@@ -806,5 +912,4 @@ char *sf_fgets(char *s, int size, FILE *stream) {
 #define sf_vsprintf sf_vsnprintf
 #define vsprintf sf_vsnprintf
 #define fflush sf_fflush_out
-
 
