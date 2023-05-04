@@ -868,6 +868,10 @@ int *create_delim_dict(const char *delim, size_t max_len) {
 }
 
 char *sf_strtok(char *str, const char *delim, size_t max_len) {
+  /*
+    //https://stackoverflow.com/questions/28931379/implementation-of-strtok-function
+    //https://github.com/kohn1001/mystrtok/blob/master/strtok.c
+  */
   static char *last_token, *to_free;
   int *deli_dict = create_delim_dict(delim, max_len);
 
