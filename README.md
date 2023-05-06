@@ -5,7 +5,6 @@ Set of Custom C Functions that are Safe Alternatives.
 #### Untested but available functions:
 
 ```
-(done) putc()
 (done) putchar()
 (done) strdup()
 (done) memcpy()
@@ -39,6 +38,7 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) strlen() (tested)
 (done) strtok() (tested)
 (done) memset() (tested)
+(done) putc() (tested)
 ```
 
 #### Planned:

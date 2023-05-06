@@ -1,4 +1,4 @@
-// Last Change: 2023-05-04  Thursday: 08:35:24 PM
+// Last Change: 2023-05-06  Saturday: 03:04:50 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -157,6 +157,16 @@ int main() { // main function
 
   vsprintf_test("%d %c %d", 123, '<', 456);
   vsprintf_test("%s", "This is a string");
+  FILE *fp;
+  int karctr; // ASCII character
+  fp = fopen("../testfile2.txt", "w"); // open file for writing
+
+  for(karctr = 33 ; karctr <= 100; karctr++) { // loop through the printable ASCII characters
+    sf_putc(karctr, fp); // write the character to the file
+  }
+
+  fclose(fp); // close the file
+  printf("See the contents of the file \"testfile2.txt\"\n");
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
