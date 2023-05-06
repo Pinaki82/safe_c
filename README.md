@@ -6,7 +6,6 @@ Set of Custom C Functions that are Safe Alternatives.
 
 ```
 (done) strdup()
-(done) memcpy()
 (done) fscanf()
 (done) snprintf()
 (done) sscanf()
@@ -23,12 +22,12 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) assert() (tested) -> static_assert()
 (done) fflush() for input streams (tested)
 (done) sprintf() (tested)
-(done) puts() (tested)
+(done) puts() (tested) (tested)
 (done) getc() (tested)
 (done) strndup() (tested)
 (done) cls() (tested)
 (done) fgets() (tested)
-(done) strcpy() (tested)
+(done) strcpy() (tested) (tested)
 (done) strncpy() (tested)
 (done) vsnprintf() (tested)
 (done) vsprintf() (tested)
@@ -37,6 +36,7 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) strlen() (tested)
 (done) strtok() (tested)
 (done) memset() (tested)
+(done) memcpy() (tested)
 (done) putc() (tested)
 (done) putchar() (tested)
 ```
