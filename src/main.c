@@ -1,4 +1,4 @@
-// Last Change: 2023-05-06  Saturday: 03:19:47 PM
+// Last Change: 2023-05-06  Saturday: 03:55:21 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -174,6 +174,15 @@ int main() { // main function
   }
 
   printf("\n");
+  const char srcstr[50] = "Terminal";
+  char deststr[50];
+  sf_strcpy(deststr, "Emulator!", (size_t)sizeof(deststr));
+  sf_puts("deststr: before memcpy: \n", stdout);
+  sf_puts(deststr, stdout);
+  /* Copy contents of the source to the destination */
+  sf_memcpy(deststr, srcstr, (sf_strlen(srcstr, (size_t)(sizeof(deststr)))));
+  sf_puts("deststr: after sf_memcpy: \n", stdout);
+  sf_puts(deststr, stdout);
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
