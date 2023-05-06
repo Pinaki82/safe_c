@@ -5,7 +5,6 @@ Set of Custom C Functions that are Safe Alternatives.
 #### Untested but available functions:
 
 ```
-(done) strdup()
 (done) fscanf()
 (done) snprintf()
 (done) sscanf()
@@ -24,6 +23,7 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) sprintf() (tested)
 (done) puts() (tested) (tested)
 (done) getc() (tested)
+(done) strdup() (tested)
 (done) strndup() (tested)
 (done) cls() (tested)
 (done) fgets() (tested)

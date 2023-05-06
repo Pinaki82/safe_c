@@ -1,4 +1,4 @@
-// Last Change: 2023-05-06  Saturday: 03:55:21 PM
+// Last Change: 2023-05-06  Saturday: 11:26:53 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -183,6 +183,13 @@ int main() { // main function
   sf_memcpy(deststr, srcstr, (sf_strlen(srcstr, (size_t)(sizeof(deststr)))));
   sf_puts("deststr: after sf_memcpy: \n", stdout);
   sf_puts(deststr, stdout);
+  printf("\n");
+  char *str_4_strdup_src = "strdupTest";
+  char *str_4_strdup_target = strdup(str_4_strdup_src);
+  printf("%s\n", str_4_strdup_target);
+  char *str_4_strndup_src = "strNdupTest";
+  char *str_4_strndup_target = strndup(str_4_strndup_src, 7);
+  printf("%s\n", str_4_strndup_target);
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
