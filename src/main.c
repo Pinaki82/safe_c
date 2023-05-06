@@ -1,4 +1,4 @@
-// Last Change: 2023-05-06  Saturday: 03:04:50 PM
+// Last Change: 2023-05-06  Saturday: 03:19:47 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -167,6 +167,13 @@ int main() { // main function
 
   fclose(fp); // close the file
   printf("See the contents of the file \"testfile2.txt\"\n");
+  char krctr_chtype;
+
+  for(krctr_chtype = '1'; krctr_chtype <= '9'; krctr_chtype++) { // prints 1 to 9
+    sf_putchar(krctr_chtype);
+  }
+
+  printf("\n");
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
