@@ -150,6 +150,8 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg);
 
 int sf_fscanf(FILE *fp, const char *format, ...);
 
+int sf_snprintf(char *dest, size_t dest_size, const char *format, ...);
+
 #ifdef __cplusplus
 }
 #endif
@@ -160,6 +162,9 @@ int sf_fscanf(FILE *fp, const char *format, ...);
 
 /* A backup function for sprintf() that uses the safe version of vsnprintf(). */
 int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...);
+
+/* A backup function for snprintf() that uses another safe version of vsnprintf(). */
+int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
 /* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
 int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
@@ -609,6 +614,20 @@ int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...
   va_list args;
   va_start(args, format);
   int len = sf_vsnprintf(dest, dest_size, format, args);
+  va_end(args);
+  return len;
+}
+
+int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
+  int len = vsnprintf(dest, dest_size, format, args);
+  dest[dest_size - 1] = '\0'; // Null-terminate the string
+  return len;
+}
+
+int sf_snprintf(char *dest, size_t dest_size, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  int len = backup_4_safe_vsnprintf(dest, dest_size, format, args);
   va_end(args);
   return len;
 }

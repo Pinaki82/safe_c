@@ -206,6 +206,12 @@ int main() { // main function
   printf("Read String3 |%s|\n", str_4_fscanf_3);
   printf("Read String4 |%s|\n", str_4_fscanf_4);
   fclose(file3);
+  char buffer_4_snprintf[50];
+  char *s2 = "\"HereIsMyName: Appu.\"";
+  printf("Writing %s onto buffer with capacity 15\n", s2);
+  int retval01 = sf_snprintf(buffer_4_snprintf, 15, "%s\n", s2);
+  printf("String written on buffer = %s\n", buffer_4_snprintf);
+  printf("Value returned by sf_snprintf() method = %d\n", retval01);
   sf_holdscr();
   int x = 5;
   sf_assert(x > 10);

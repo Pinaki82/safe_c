@@ -5,7 +5,6 @@ Set of Custom C Functions that are Safe Alternatives.
 #### Untested but available functions:
 
 ```
-(done) snprintf()
 (done) sscanf()
 (done) strcat()
 (done) vfprintf()
@@ -40,6 +39,7 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) putchar() (tested)
 (done) fscanf() (tested)
 (done) vfscanf() (tested)
+(done) snprintf() (tested)
 ```
 
 #### Planned:
