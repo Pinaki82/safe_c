@@ -206,6 +206,7 @@ int main() { // main function
   printf("Read String3 |%s|\n", str_4_fscanf_3);
   printf("Read String4 |%s|\n", str_4_fscanf_4);
   fclose(file3);
+  sf_holdscr();
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
