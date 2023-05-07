@@ -925,7 +925,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
   return result;
 }
 
-int sf_fscanf(FILE *fp, const char *format, ...) {
+int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements required. Buff overflow, null bytes, invalid inputs
   // Check for NULL stream and format
   if(fp == NULL || format == NULL) {
     fprintf(stderr, "Error: Invalid input.\n");
