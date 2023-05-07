@@ -1,4 +1,4 @@
-// Last Change: 2023-05-06  Saturday: 11:26:53 PM
+// Last Change: 2023-05-07  Sunday: 01:06:36 AM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -159,13 +159,16 @@ int main() { // main function
   vsprintf_test("%s", "This is a string");
   FILE *fp;
   int karctr; // ASCII character
-  fp = fopen("../testfile2.txt", "w"); // open file for writing
+  fp = fopen("../testfile2.txt", "w+"); // open file for writing
 
   for(karctr = 33 ; karctr <= 100; karctr++) { // loop through the printable ASCII characters
     sf_putc(karctr, fp); // write the character to the file
   }
 
   fclose(fp); // close the file
+  fp = fopen("../testfile2.txt", "a");
+  fprintf(fp, "\n");
+  fclose(fp);
   printf("See the contents of the file \"testfile2.txt\"\n");
   char krctr_chtype;
 
@@ -190,6 +193,19 @@ int main() { // main function
   char *str_4_strndup_src = "strNdupTest";
   char *str_4_strndup_target = strndup(str_4_strndup_src, 7);
   printf("%s\n", str_4_strndup_target);
+  FILE *file3;
+  char str_4_fscanf_1[10], str_4_fscanf_2[10], str_4_fscanf_3[10], str_4_fscanf_4[50];
+  file3 = fopen("../testfile3.txt", "w+");
+  fputs("We are testing fscanfTest\n", file3);
+  fclose(file3);
+  file3 = fopen("../testfile3.txt", "r");
+  rewind(file3);
+  sf_fscanf(file3, "%s %s %s %s", str_4_fscanf_1, str_4_fscanf_2, str_4_fscanf_3, str_4_fscanf_4);
+  printf("Read String1 |%s|\n", str_4_fscanf_1);
+  printf("Read String2 |%s|\n", str_4_fscanf_2);
+  printf("Read String3 |%s|\n", str_4_fscanf_3);
+  printf("Read String4 |%s|\n", str_4_fscanf_4);
+  fclose(file3);
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");

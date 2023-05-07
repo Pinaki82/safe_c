@@ -1,4 +1,4 @@
-// Last Change: 2023-05-04  Thursday: 08:23:53 PM
+// Last Change: 2023-05-07  Sunday: 01:46:24 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -137,8 +137,6 @@ char *strndup(const char *s, size_t n);
 
 char *sf_fgets(char *s, int size, FILE *stream);
 
-int sf_fscanf(FILE *stream, const char *format, int buffer_size, char *buffer, ...);
-
 char *sf_strtok(char *str, const char *delim, size_t max_len);
 
 errno_t sf_memset(
@@ -148,7 +146,9 @@ errno_t sf_memset(
         size_t count
 );
 
+int sf_vfscanf(FILE *stream, const char *format, va_list arg);
 
+int sf_fscanf(FILE *fp, const char *format, ...);
 
 #ifdef __cplusplus
 }
@@ -764,40 +764,6 @@ char *strndup(const char *s, size_t n) {
   return p;
 }
 
-int sf_fscanf(FILE *stream, const char *format, int buffer_size, char *buffer, ...) {
-  int result;
-
-  if(buffer_size <= 0) {
-    fprintf(stderr, "Error: Invalid buffer size\n");
-    return EOF;
-  }
-
-  // Allocate memory for temporary buffer
-  char *tmp_buffer = (char *)malloc((size_t)buffer_size * sizeof(char));
-
-  if(tmp_buffer == NULL) {
-    fprintf(stderr, "Error: Memory allocation failed\n");
-    return EOF;
-  }
-
-  // Read input into temporary buffer
-  if(sf_fgets(tmp_buffer, buffer_size, stream) == NULL) {
-    free(tmp_buffer);
-    return EOF;
-  }
-
-  // Scan input from temporary buffer into output buffer
-  va_list args;
-  va_start(args, buffer);
-  result = vsscanf(tmp_buffer, format, args);
-  va_end(args);
-  // Copy contents of temporary buffer to output buffer
-  strncpy(buffer, tmp_buffer, (size_t)buffer_size);
-  buffer[buffer_size - 1] = '\0';
-  free(tmp_buffer);
-  return result;
-}
-
 char *sf_fgets(char *s, int size, FILE *stream) {
   if(size <= 0) {
     fprintf(stderr, "Error: Invalid buffer size.\n");
@@ -928,8 +894,51 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
   return (char *)str;
 }
 
+int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
+  /*
+    - The function first formats the input string using vsnprintf() and stores it in a buffer.
+    - It then checks for buffer overflow by comparing the length of the formatted string with the size of the buffer.
+    - It also checks for null bytes by searching for the first null byte in the buffer.
+    - Finally, it calls vfscanf() to read input from the stream and checks if the file position indicator is within bounds.
+  */
+  char buffer[BUFSIZ];
+  int n = vsnprintf(buffer, BUFSIZ - 1, format, arg);
 
+  if(n < 0 || n >= BUFSIZ) {
+    return EOF;
+  }
 
+  if(strchr(buffer, '\0') != buffer + n) {
+    return EOF;
+  }
+
+  int result = vfscanf(stream, format, arg);
+
+  if(result == EOF) {
+    return EOF;
+  }
+
+  if(ftell(stream) > BUFSIZ) {
+    return EOF;
+  }
+
+  return result;
+}
+
+int sf_fscanf(FILE *fp, const char *format, ...) {
+  // Check for NULL stream and format
+  if(fp == NULL || format == NULL) {
+    fprintf(stderr, "Error: Invalid input.\n");
+    return EOF;
+  }
+
+  va_list args;
+  int ret;
+  va_start(args, format);
+  ret = sf_vfscanf(fp, format, args);
+  va_end(args);
+  return ret;
+}
 
 
 
