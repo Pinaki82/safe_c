@@ -84,7 +84,7 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
-int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len);
+int sf_sscanf(const char *restrict str, const char *restrict format, ...);
 
 // function: holds the screen before the text disappears
 void sf_holdscr(void);
@@ -297,14 +297,18 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
 }
 
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
-int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len) {
-  if(str == NULL || format == NULL || arg == NULL) {
+int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
+  if(str == NULL || format == NULL) {
     // Invalid input
     return EOF;
   }
 
   // Allocate memory for a copy of the string
-  char *str_copy = (char *)malloc(max_len + 1);
+  va_list args;
+  va_start(args, format);
+  int result = vsnprintf(NULL, 0, format, args);
+  va_end(args);
+  char *str_copy = (char *)malloc(result + 1);
 
   if(!str_copy) {
     // Failed to allocate memory
@@ -312,10 +316,12 @@ int sf_sscanf(const char *str, const char *format, void *arg, size_t max_len) {
   }
 
   // Copy the input string
-  strncpy(str_copy, str, max_len);
-  str_copy[max_len] = '\0';
+  strncpy(str_copy, str, result);
+  str_copy[result] = '\0';
   // Parse the input using sscanf()
-  int result = sscanf(str_copy, format, arg);
+  va_start(args, format);
+  result = vsscanf(str_copy, format, args);
+  va_end(args);
   // Free the memory used by the string copy
   free(str_copy);
   return result;

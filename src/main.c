@@ -9,6 +9,8 @@
   #define  MAXBUFF  1E+5f
 #endif
 
+#define MAXCHARSIZE 100
+
 void vsprintf_test(char const *const format, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...);
 
@@ -212,6 +214,20 @@ int main() { // main function
   int retval01 = sf_snprintf(buffer_4_snprintf, 15, "%s\n", s2);
   printf("String written on buffer = %s\n", buffer_4_snprintf);
   printf("Value returned by sf_snprintf() method = %d\n", retval01);
+  char dtm[MAXCHARSIZE];
+  char weekday[20], month[20];
+  int day, year;
+  // Set the date/time string
+  sf_strcpy(dtm, "Saturday March 25 1989", MAXCHARSIZE);
+
+  // Parse the date/time string using sf_sscanf()
+  if(sf_sscanf(dtm, "%s %s %d %d", weekday, month, &day, &year, MAXCHARSIZE) != 4) {
+    printf("Error: failed to parse date/time string.\n");
+    return 1;
+  }
+
+  // Print the parsed date/time values
+  printf("%s %d, %d = %s\n", month, day, year, weekday);
   sf_holdscr();
   int x = 5;
   sf_assert(x > 10);
