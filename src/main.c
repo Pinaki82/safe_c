@@ -228,6 +228,19 @@ int main() { // main function
 
   // Print the parsed date/time values
   printf("%s %d, %d = %s\n", month, day, year, weekday);
+  char myname[100] = "Pinaki ", mysurname[] = "Gupta", completename[150];
+  int count = 0;
+
+  do {
+    *(completename + count) = '\0';
+    count++;
+  } while(count < 150);
+
+  sf_strcat(completename, myname, 150);
+  sf_strcat(completename, mysurname, 150);
+  printf("%s\n", myname);
+  printf("%s\n", mysurname);
+  printf("%s\n", completename);
   sf_holdscr();
   int x = 5;
   sf_assert(x > 10);
