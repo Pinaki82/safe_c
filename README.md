@@ -42,13 +42,13 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) strcat() (tested)
 (done) vfprintf() (tested)
 (done) strchr() (tested)
+(done) strncat() (tested)
 ```
 
 #### Planned:
 
 ```
 fopen() [Already safe. Snippets required.]
-strncat()
 fwrite()
 fprintf()
 fputs()

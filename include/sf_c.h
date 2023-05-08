@@ -154,6 +154,8 @@ int sf_snprintf(char *dest, size_t dest_size, const char *format, ...);
 
 char *sf_strchr(const char *str, int ch);
 
+char *sf_strncat(char *dest, const char *src, size_t n);
+
 #ifdef __cplusplus
 }
 #endif
@@ -989,6 +991,32 @@ char *sf_strchr(const char *str, int ch) {
   }
 
   return NULL;
+}
+
+char *sf_strncat(char *dest, const char *src, size_t n) {
+  if(dest == NULL || src == NULL || n == 0) {
+    printf("Invalid input\n");
+    return dest;
+  }
+
+  size_t dest_len = sf_strlen(dest, n);
+  size_t src_len = sf_strlen(src, n);
+
+  if(dest_len == n) {
+    printf("Destination buffer is already full\n");
+    return dest;
+  }
+
+  size_t total_len = dest_len + src_len;
+
+  if(total_len >= n) {
+    src_len = n - dest_len - 1;
+    printf("Source string was truncated to fit the destination buffer\n");
+  }
+
+  memmove(dest + dest_len, src, src_len);
+  dest[dest_len + src_len] = '\0';
+  return dest;
 }
 
 

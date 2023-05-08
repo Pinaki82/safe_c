@@ -10,6 +10,7 @@
 #endif
 
 #define MAXCHARSIZE 100
+#define MAX_LENGTH_STRNCAT 20
 
 void vsprintf_test(char const *const format, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...);
@@ -260,6 +261,10 @@ int main() { // main function
   char *ret;
   ret = sf_strchr(strtest001, ch);
   printf("String after |%c| is - |%s|\n", ch, ret);
+  char destStrncat[MAX_LENGTH_STRNCAT] = "Hello";
+  char srcStrncat[10] = "ChatGPT";
+  sf_strncat(destStrncat, srcStrncat, MAX_LENGTH_STRNCAT);
+  printf("%s\n", destStrncat);
   sf_holdscr();
   int x = 5;
   sf_assert(x > 10);
