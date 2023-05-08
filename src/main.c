@@ -13,6 +13,7 @@
 
 void vsprintf_test(char const *const format, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...);
+void writeFormattedOutput(FILE *stream, const char *format, ...);
 
 void vsprintf_test(char const *const format, ...) {
   //https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/vsprintf-s-vsprintf-s-l-vswprintf-s-vswprintf-s-l?view=msvc-170
@@ -37,6 +38,13 @@ void writing_out(char *buf, int buf_size, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
   sf_vsnprintf(buf, (size_t)buf_size, fmt, args);
+  va_end(args);
+}
+
+void writeFormattedOutput(FILE *stream, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  sf_vfprintf(stream, format, args);
   va_end(args);
 }
 
@@ -241,6 +249,12 @@ int main() { // main function
   printf("%s\n", myname);
   printf("%s\n", mysurname);
   printf("%s\n", completename);
+  FILE *pFile2;
+  pFile2 = fopen("../testfile4.txt", "w");
+  writeFormattedOutput(pFile2, "Call with %d variable argument.\n", 1);
+  writeFormattedOutput(pFile2, "Call with %d variable %s.\n", 2, "arguments");
+  fclose(pFile2);
+  printf("see the output file textfile4.txt\n");
   sf_holdscr();
   int x = 5;
   sf_assert(x > 10);
