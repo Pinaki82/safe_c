@@ -64,7 +64,7 @@ makepath -> _makepath_s (MSDN)
 _splitpath -> _splitpath_s (MSDN)
 ```
 
-#### Needs to be investigated:
+#### Need to be investigated:
 
 ```
 strlcpy()
