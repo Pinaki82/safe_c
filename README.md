@@ -41,6 +41,7 @@ Set of Custom C Functions that are Safe Alternatives.
 (done) sscanf() (tested)
 (done) strcat() (tested)
 (done) vfprintf() (tested)
+(done) strchr() (tested)
 ```
 
 #### Planned:

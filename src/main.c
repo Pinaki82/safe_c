@@ -255,6 +255,11 @@ int main() { // main function
   writeFormattedOutput(pFile2, "Call with %d variable %s.\n", 2, "arguments");
   fclose(pFile2);
   printf("see the output file textfile4.txt\n");
+  const char strtest001[] = "Wikipedia is a multilingual, free, online encyclopedia written and maintained by a community of volunteers.";
+  const char ch = ',';
+  char *ret;
+  ret = sf_strchr(strtest001, ch);
+  printf("String after |%c| is - |%s|\n", ch, ret);
   sf_holdscr();
   int x = 5;
   sf_assert(x > 10);

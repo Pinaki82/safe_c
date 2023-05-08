@@ -1,4 +1,4 @@
-// Last Change: 2023-05-07  Sunday: 01:46:24 PM
+// Last Change: 2023-05-08  Monday: 11:12:40 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -19,7 +19,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>  // for size_t
+#include <stddef.h>  // for size_t, sf_strchr()
 #include <string.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/file-constants?view=msvc-170
 #include <fcntl.h>
@@ -151,6 +151,8 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg);
 int sf_fscanf(FILE *fp, const char *format, ...);
 
 int sf_snprintf(char *dest, size_t dest_size, const char *format, ...);
+
+char *sf_strchr(const char *str, int ch);
 
 #ifdef __cplusplus
 }
@@ -964,6 +966,31 @@ int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements require
   va_end(args);
   return ret;
 }
+
+char *sf_strchr(const char *str, int ch) {
+  /*
+    This implementation checks for null pointers and returns NULL
+    if the input string is null. It also checks for buffer overflow by
+    iterating through the string until it finds the null terminator.
+    If it doesn't find the null terminator, then it returns NULL.
+  */
+  if(str == NULL) {
+    return NULL;
+  }
+
+  const char *p = str;
+
+  while(*p != '\0') {
+    if(*p == ch) {
+      return (char *) p;
+    }
+
+    p++;
+  }
+
+  return NULL;
+}
+
 
 
 
