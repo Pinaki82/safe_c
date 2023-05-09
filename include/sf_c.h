@@ -1,4 +1,4 @@
-// Last Change: 2023-05-08  Monday: 11:12:40 AM
+// Last Change: 2023-05-09  Tuesday: 05:08:05 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <stdint.h> // for uint8_t
 
 
 
@@ -46,6 +47,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void *sf_memmove(void *dest, const void *src, size_t n);
 
 // an alternative function to strlen() that checks buffer size as an argument
 size_t sf_strlen(const char *str, size_t max_len);
@@ -178,6 +181,38 @@ int is_valid_input_char(char c);
 int *create_delim_dict(const char *delim, size_t max_len);
 
 /* Fn definitions start here */
+
+void *sf_memmove(void *dest, const void *src, size_t n) {
+  uint8_t *d = (uint8_t *) dest;
+  const uint8_t *s = (const uint8_t *) src;
+
+  if((uintptr_t) dest == (uintptr_t) src || !n) {
+    fprintf(stderr, "Invalid memmove() call\n");
+    abort(); // exit process immediately, for debugging purposes
+  }
+
+  size_t i = 0;
+
+  while(i + 7 <= n && s[i] == '\0') {
+    i++;
+  }
+
+  if(i > 0 && i < n) {
+    fprintf(stderr, "Source contains embedded null character(s), which will be left intact.\n");
+  }
+
+  else if(i >= n) {
+    fprintf(stderr, "Source data length exceeds destination buffer size.\n");
+    abort();
+  }
+
+  while(i < n) {
+    d[i] = s[i];
+    i++;
+  }
+
+  return dest;
+}
 
 // an alternative function to strlen() that checks buffer size as an argument
 // Based on // https://stackoverflow.com/questions/5935413/is-there-a-safe-version-of-strlen
@@ -545,7 +580,7 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
     return -1;
   }
 
-  memmove(new_format, format, format_size);
+  sf_memmove(new_format, format, format_size);
   // Replace all instances of "%.s" with "%.*s" to limit the length of the string argument.
   char *ptr = new_format;
 
@@ -566,8 +601,8 @@ int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args)
 
       new_format = temp;
       ptr = new_format + offset;
-      memmove(ptr + 3, ptr + 2, strlen(ptr + 2) + 1);
-      memmove(ptr, "%.*s", 3);
+      sf_memmove(ptr + 3, ptr + 2, strlen(ptr + 2) + 1);
+      sf_memmove(ptr, "%.*s", 3);
       ptr += 3;
     }
   }
@@ -738,7 +773,7 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
 }
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes) {
-  return memmove(to, from, numBytes);
+  return sf_memmove(to, from, numBytes);
 }
 
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
@@ -754,7 +789,7 @@ char *strdup(const char *s) {
   }
 
   if(p != NULL) {
-    memmove(p, s, size);
+    sf_memmove(p, s, size);
   }
 
   else {
@@ -781,7 +816,7 @@ char *strndup(const char *s, size_t n) {
   }
 
   if(p != NULL) {
-    memmove(p, s, n1);
+    sf_memmove(p, s, n1);
     p[n1] = '\0';
   }
 
@@ -1014,7 +1049,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
     printf("Source string was truncated to fit the destination buffer\n");
   }
 
-  memmove(dest + dest_len, src, src_len);
+  sf_memmove(dest + dest_len, src, src_len);
   dest[dest_len + src_len] = '\0';
   return dest;
 }
