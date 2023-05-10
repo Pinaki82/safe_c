@@ -81,7 +81,7 @@ char *sf_sprintf(const char *format, ...);
 bool sf_atoi(const char *str, int *result);
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
-int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
+int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
@@ -345,7 +345,7 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   // Allocate memory for a copy of the string
   va_list args;
   va_start(args, format);
-  int result = vsnprintf(NULL, 0, format, args);
+  int result = vsnprintf(NULL, 0, format, args); // FIXME: sf_vsnprintf
   va_end(args);
   char *str_copy = (char *)malloc((size_t)result + 1);
 
@@ -457,7 +457,7 @@ char *sf_sprintf(const char *format, ...) {
   va_list args;
   va_start(args, format);
   // Determine the size of the formatted string
-  int size = vsnprintf(NULL, 0, format, args);
+  int size = vsnprintf(NULL, 0, format, args); // vsnprintf error
 
   if(size < 0) {
     // vsnprintf encountered an error
@@ -477,11 +477,11 @@ char *sf_sprintf(const char *format, ...) {
   }
 
   // Write the formatted string to the buffer
-  int written = vsnprintf(buffer, (size_t)(size + 1), format, args);
+  int written = sf_vsnprintf(buffer, (size_t)(size + 1), format, args);
   va_end(args);
 
   if(written < 0 || written > size) {
-    // vsnprintf encountered an error or wrote more characters than expected
+    // sf_vsnprintf encountered an error or wrote more characters than expected
     free(buffer);
     return NULL;
   }
@@ -560,65 +560,90 @@ bool sf_atoi(const char *str, int *result) {
 */
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
-int sf_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  // Ensure that the destination buffer is not null and that its size is at least 1.
-  if(!dest || dest_size < 1) {
-    return -1;
-  }
+int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
+  char *buf_end = buf + size - 1; // leave space for null terminator
+  char *buf_ptr = buf;
+  const char *fmt_ptr = fmt;
 
-  // Ensure that the format string is not null.
-  if(!format) {
-    dest[0] = '\0';
-    return 0;
-  }
+  while(*fmt_ptr && buf_ptr < buf_end) {
+    if(*fmt_ptr != '%') {
+      *buf_ptr++ = *fmt_ptr++;
+      continue;
+    }
 
-  // Copy the format string to a new buffer so that we can modify it safely.
-  size_t format_size = strlen(format) + 1;
-  char *new_format = (char *)malloc(format_size * sizeof(char));
+    fmt_ptr++;
 
-  if(!new_format) {
-    return -1;
-  }
+    if(*fmt_ptr == '%') {
+      *buf_ptr++ = '%';
+      fmt_ptr++;
+      continue;
+    }
 
-  sf_memmove(new_format, format, format_size);
-  // Replace all instances of "%.s" with "%.*s" to limit the length of the string argument.
-  char *ptr = new_format;
+    if(*fmt_ptr == '\0') {
+      break;
+    }
 
-  while((ptr = strstr(ptr, "%.s")) != NULL) {
-    if(*(ptr + 3) == '.') {
-      ptr += 4;
+    if(*fmt_ptr == 'd') {
+      int value = va_arg(args, int);
+      char value_buf[12];
+      char *value_ptr = value_buf;
+
+      if(value < 0) {
+        *buf_ptr++ = '-';
+        value = -value;
+      }
+
+      do {
+        *value_ptr++ = value % 10 + '0';
+        value /= 10;
+      } while(value > 0 && value_ptr < value_buf + sizeof(value_buf));
+
+      while(value_ptr > value_buf && buf_ptr < buf_end) {
+        *buf_ptr++ = *--value_ptr;
+      }
+
+      fmt_ptr++;
+    }
+
+    else if(*fmt_ptr == 's') {
+      char *value = va_arg(args, char *);
+      size_t remaining_space = (size_t)(buf_end - buf_ptr);
+
+      if(value == NULL) {
+        value = "(null)";
+      }
+
+      size_t value_len = strnlen(value, remaining_space);
+      memmove(buf_ptr, value, value_len); //FIXME: Possible src of error sf_memmove
+      buf_ptr += value_len;
+      fmt_ptr++;
+    }
+
+    else if(*fmt_ptr == 'x') {
+      unsigned int value = va_arg(args, unsigned int);
+      char value_buf[8];
+      char *value_ptr = value_buf;
+
+      do {
+        unsigned int nibble = value & 0xf;
+        *value_ptr++ = (char)(nibble + (nibble < 10 ? '0' : 'a' - 10));
+        value >>= 4;
+      } while(value > 0 && value_ptr < value_buf + sizeof(value_buf));
+
+      while(value_ptr > value_buf && buf_ptr < buf_end) {
+        *buf_ptr++ = *--value_ptr;
+      }
+
+      fmt_ptr++;
     }
 
     else {
-      size_t offset = (size_t)(ptr - new_format);
-      size_t new_format_size = strlen(new_format) + 3;
-      char *temp = (char *)realloc(new_format, new_format_size);
-
-      if(!temp) {
-        free(new_format);
-        return -1;
-      }
-
-      new_format = temp;
-      ptr = new_format + offset;
-      sf_memmove(ptr + 3, ptr + 2, strlen(ptr + 2) + 1);
-      sf_memmove(ptr, "%.*s", 3);
-      ptr += 3;
+      break;
     }
   }
 
-  // Call vsnprintf with the modified format string.
-  int result = vsnprintf(dest, dest_size, new_format, args);
-  // Free the new format string buffer.
-  free(new_format);
-
-  // Return the number of characters that would have been written if there were enough space.
-  if(result < 0 || (size_t)result >= dest_size) {
-    dest[dest_size - 1] = '\0';
-    return (int)(dest_size - 1);
-  }
-
-  return result;
+  *buf_ptr = '\0';
+  return (int)(buf_ptr - buf);
 }
 
 /* A backup function for sprintf() that uses the safe version of vsnprintf(). */
@@ -664,7 +689,7 @@ int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...
 }
 
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  int len = vsnprintf(dest, dest_size, format, args);
+  int len = sf_vsnprintf(dest, dest_size, format, args);
   dest[dest_size - 1] = '\0'; // Null-terminate the string
   return len;
 }
@@ -966,7 +991,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
     - Finally, it calls vfscanf() to read input from the stream and checks if the file position indicator is within bounds.
   */
   char buffer[BUFSIZ];
-  int n = vsnprintf(buffer, BUFSIZ - 1, format, arg);
+  int n = sf_vsnprintf(buffer, BUFSIZ - 1, format, arg);
 
   if(n < 0 || n >= BUFSIZ) {
     return EOF;
@@ -999,7 +1024,7 @@ int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements require
   va_list args;
   int ret;
   va_start(args, format);
-  ret = sf_vfscanf(fp, format, args);
+  ret = sf_vfscanf(fp, format, args); // FIXME: Possible source of problem
   va_end(args);
   return ret;
 }
