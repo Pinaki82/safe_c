@@ -167,14 +167,8 @@ char *sf_strncat(char *dest, const char *src, size_t n);
 
 /* Non-global prototypes */
 
-/* A backup function for sprintf() that uses the safe version of vsnprintf(). */
-int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...);
-
 /* A backup function for snprintf() that uses another safe version of vsnprintf(). */
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
-
-/* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
-int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...);
 
 int is_valid_input_char(char c);
 
@@ -646,15 +640,6 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
   return (int)(buf_ptr - buf);
 }
 
-/* A backup function for sprintf() that uses the safe version of vsnprintf(). */
-int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...) {
-  va_list args;
-  va_start(args, format);
-  int result = sf_vsnprintf(dest, dest_size, format, args);
-  va_end(args);
-  return result;
-}
-
 /*
    sf_vsprintf - Safely format a variable argument list to a string buffer with size checking.
 
@@ -677,15 +662,6 @@ int backup_4_safe_sprintf(char *dest, size_t dest_size, const char *format, ...)
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args) {
   return sf_vsnprintf(dest, dest_size, format, args);
-}
-
-/* Safe version of `snprintf()`, ensuring destination buffer is not null and size is at least 1. Used as a backup required by `backup_4_safe_sprintf()`. */
-int backup_4_safe_snprintf(char *dest, size_t dest_size, const char *format, ...) {
-  va_list args;
-  va_start(args, format);
-  int len = sf_vsnprintf(dest, dest_size, format, args);
-  va_end(args);
-  return len;
 }
 
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
