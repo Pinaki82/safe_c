@@ -347,7 +347,7 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   va_start(args, format);
   int result = vsnprintf(NULL, 0, format, args);
   va_end(args);
-  char *str_copy = (char *)malloc(result + 1);
+  char *str_copy = (char *)malloc((size_t)result + 1);
 
   if(!str_copy) {
     // Failed to allocate memory
