@@ -247,11 +247,17 @@ void *my_memmove(void *destn, const void *src, unsigned int n) {
 }
 
 void *sf_memmove2(void *destn, const void *src, unsigned int n) {
+  n = n + 1;
   char *pDest = (char *)destn;
   const char *pSrc = (const char *)src;
 
-  if(src == NULL || !n) {
-    fprintf(stderr, "Invalid memmove() call\n");
+  if(!n) {
+    fprintf(stderr, "Invalid memmove() call: !n\n");
+    return NULL;
+  }
+
+  if(src == NULL) {
+    fprintf(stderr, "Invalid memmove() call: src == NULL\n");
     return NULL;
   }
 
@@ -271,16 +277,19 @@ void *sf_memmove2(void *destn, const void *src, unsigned int n) {
     }
   }
 
-  else {
+  else { // if the current position in the destination buffer (pDest + i) is greater than or equal to the end of the destination buffer ((char*)destn + n). If it is, an error message is printed and NULL is returned.
     for(unsigned int i = 0; i < n; i++) {
+      if((pDest + i) >= ((char *)destn + n)) {
+        fprintf(stderr, "Destination buffer is not big enough\n");
+        return NULL;
+      }
+
       *(pDest + i) = *(pSrc + i);
     }
   }
 
   return destn;
 }
-
-
 
 // an alternative function to strlen() that checks buffer size as an argument
 // Based on // https://stackoverflow.com/questions/5935413/is-there-a-safe-version-of-strlen
@@ -682,7 +691,7 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
       }
 
       size_t value_len = strnlen(value, remaining_space);
-      sf_memmove2(buf_ptr, value, value_len);  //FIXME: Possible src of error sf_memmove
+      sf_memmove2(buf_ptr, value, value_len + 1);  //FIXME: (solved by adding 1) Possible src of error sf_memmove
       buf_ptr += value_len;
       fmt_ptr++;
     }
@@ -864,7 +873,7 @@ char *strdup(const char *s) {
   }
 
   if(p != NULL) {
-    sf_memmove2(p, s, size);
+    sf_memmove2(p, s, size + 1);
   }
 
   else {
@@ -891,7 +900,7 @@ char *strndup(const char *s, size_t n) {
   }
 
   if(p != NULL) {
-    sf_memmove2(p, s, n1);
+    sf_memmove2(p, s, n1 + 1);
     p[n1] = '\0';
   }
 
@@ -1124,7 +1133,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
     printf("Source string was truncated to fit the destination buffer\n");
   }
 
-  sf_memmove2(dest + dest_len, src, src_len);
+  sf_memmove2(dest + dest_len, src, src_len + 1);
   dest[dest_len + src_len] = '\0';
   return dest;
 }
