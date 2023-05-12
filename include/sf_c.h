@@ -48,9 +48,7 @@
 extern "C" {
 #endif
 
-void *sf_memmove(void *dest, const void *src, size_t n);
-void *my_memmove(void *destn, const void *src, unsigned int n);
-void *sf_memmove2(void *destn, const void *src, unsigned int n);
+void *sf_memmove(void *destn, const void *src, unsigned int n);
 
 // an alternative function to strlen() that checks buffer size as an argument
 size_t sf_strlen(const char *str, size_t max_len);
@@ -178,75 +176,7 @@ int *create_delim_dict(const char *delim, size_t max_len);
 
 /* Fn definitions start here */
 
-void *sf_memmove(void *dest, const void *src, size_t n) {
-  uint8_t *d = (uint8_t *) dest;
-  const uint8_t *s = (const uint8_t *) src;
-
-  if((uintptr_t) dest == (uintptr_t) src || !n) {
-    fprintf(stderr, "Invalid memmove() call\n");
-    abort(); // exit process immediately, for debugging purposes
-  }
-
-  size_t i = 0;
-
-  while(i + 7 <= n && s[i] == '\0') {
-    i++;
-  }
-
-  if(i > 0 && i < n) {
-    fprintf(stderr, "Source contains embedded null character(s), which will be left intact.\n");
-  }
-
-  else if(i >= n) {
-    fprintf(stderr, "Source data length exceeds destination buffer size.\n");
-    abort();
-  }
-
-  while(i < n) {
-    d[i] = s[i];
-    i++;
-  }
-
-  return dest;
-}
-
-void *my_memmove(void *destn, const void *src, unsigned int n) {
-  char *pDest = (char *)destn;
-  const char *pSrc = (const char *)src;
-
-  if((src == NULL) || (!n)) {
-    // handle null string case
-    fprintf(stderr, "%s", "null string!\n");
-    return 0;
-  }
-
-  //allocation of the memory block for the temp array
-  char *temp = (char *)malloc(sizeof(char) * n);
-
-  if(NULL == temp) {
-    return NULL;
-  }
-
-  else {
-    unsigned int i = 0;
-
-    //Copy the content from the src array to temp array first
-    for(i = 0; i < n ; ++i) {
-      *(temp + i) = *(pSrc + i);
-    }
-
-    //copy the content from the temp array to the destination array
-    for(i = 0 ; i < n ; ++i) {
-      *(pDest + i) = *(temp + i);
-    }
-
-    free(temp); //free allocated memory
-  }
-
-  return destn;
-}
-
-void *sf_memmove2(void *destn, const void *src, unsigned int n) {
+void *sf_memmove(void *destn, const void *src, unsigned int n) {
   n = n + 1;
   char *pDest = (char *)destn;
   const char *pSrc = (const char *)src;
@@ -691,7 +621,7 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
       }
 
       size_t value_len = strnlen(value, remaining_space);
-      sf_memmove2(buf_ptr, value, value_len + 1);  //FIXME: (solved by adding 1) Possible src of error sf_memmove
+      sf_memmove(buf_ptr, value, value_len + 1);  //FIXME: (solved by adding 1) Possible src of error sf_memmove
       buf_ptr += value_len;
       fmt_ptr++;
     }
@@ -857,7 +787,7 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
 }
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes) {
-  return sf_memmove2(to, from, numBytes);
+  return sf_memmove(to, from, numBytes);
 }
 
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
@@ -873,7 +803,7 @@ char *strdup(const char *s) {
   }
 
   if(p != NULL) {
-    sf_memmove2(p, s, size + 1);
+    sf_memmove(p, s, size + 1);
   }
 
   else {
@@ -900,7 +830,7 @@ char *strndup(const char *s, size_t n) {
   }
 
   if(p != NULL) {
-    sf_memmove2(p, s, n1 + 1);
+    sf_memmove(p, s, n1 + 1);
     p[n1] = '\0';
   }
 
@@ -1133,7 +1063,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
     printf("Source string was truncated to fit the destination buffer\n");
   }
 
-  sf_memmove2(dest + dest_len, src, src_len + 1);
+  sf_memmove(dest + dest_len, src, src_len + 1);
   dest[dest_len + src_len] = '\0';
   return dest;
 }
