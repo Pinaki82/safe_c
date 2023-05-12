@@ -49,6 +49,8 @@ extern "C" {
 #endif
 
 void *sf_memmove(void *dest, const void *src, size_t n);
+void *my_memmove(void *destn, const void *src, unsigned int n);
+void *sf_memmove2(void *destn, const void *src, unsigned int n);
 
 // an alternative function to strlen() that checks buffer size as an argument
 size_t sf_strlen(const char *str, size_t max_len);
@@ -207,6 +209,75 @@ void *sf_memmove(void *dest, const void *src, size_t n) {
 
   return dest;
 }
+
+void *my_memmove(void *destn, const void *src, unsigned int n) {
+  char *pDest = (char *)destn;
+  const char *pSrc = (const char *)src;
+
+  if((src == NULL) || (!n)) {
+    // handle null string case
+    fprintf(stderr, "%s", "null string!\n");
+    return 0;
+  }
+
+  //allocation of the memory block for the temp array
+  char *temp = (char *)malloc(sizeof(char) * n);
+
+  if(NULL == temp) {
+    return NULL;
+  }
+
+  else {
+    unsigned int i = 0;
+
+    //Copy the content from the src array to temp array first
+    for(i = 0; i < n ; ++i) {
+      *(temp + i) = *(pSrc + i);
+    }
+
+    //copy the content from the temp array to the destination array
+    for(i = 0 ; i < n ; ++i) {
+      *(pDest + i) = *(temp + i);
+    }
+
+    free(temp); //free allocated memory
+  }
+
+  return destn;
+}
+
+void *sf_memmove2(void *destn, const void *src, unsigned int n) {
+  char *pDest = (char *)destn;
+  const char *pSrc = (const char *)src;
+
+  if (src == NULL || !n) {
+    fprintf(stderr, "Invalid memmove() call\n");
+    return NULL;
+  }
+
+  if (destn == NULL) {
+    fprintf(stderr, "Invalid destination buffer\n");
+    return NULL;
+  }
+
+  // Check if source buffer overlaps with destination buffer
+  if (pSrc < pDest && pSrc + n > pDest) {
+    // Copy backwards to avoid overwriting source buffer
+    pSrc += n;
+    pDest += n;
+    for (unsigned int i = 0; i < n; i++) {
+      *(--pDest) = *(--pSrc);
+    }
+  } else {
+    for (unsigned int i = 0; i < n; i++) {
+      *(pDest + i) = *(pSrc + i);
+    }
+  }
+
+  return destn;
+}
+
+
 
 // an alternative function to strlen() that checks buffer size as an argument
 // Based on // https://stackoverflow.com/questions/5935413/is-there-a-safe-version-of-strlen
@@ -608,7 +679,7 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
       }
 
       size_t value_len = strnlen(value, remaining_space);
-      memmove(buf_ptr, value, value_len); //FIXME: Possible src of error sf_memmove
+      sf_memmove2(buf_ptr, value, value_len);  //FIXME: Possible src of error sf_memmove
       buf_ptr += value_len;
       fmt_ptr++;
     }
@@ -774,7 +845,7 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
 }
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes) {
-  return sf_memmove(to, from, numBytes);
+  return sf_memmove2(to, from, numBytes);
 }
 
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
@@ -790,7 +861,7 @@ char *strdup(const char *s) {
   }
 
   if(p != NULL) {
-    sf_memmove(p, s, size);
+    sf_memmove2(p, s, size);
   }
 
   else {
@@ -817,7 +888,7 @@ char *strndup(const char *s, size_t n) {
   }
 
   if(p != NULL) {
-    sf_memmove(p, s, n1);
+    sf_memmove2(p, s, n1);
     p[n1] = '\0';
   }
 
@@ -1050,7 +1121,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
     printf("Source string was truncated to fit the destination buffer\n");
   }
 
-  sf_memmove(dest + dest_len, src, src_len);
+  sf_memmove2(dest + dest_len, src, src_len);
   dest[dest_len + src_len] = '\0';
   return dest;
 }
