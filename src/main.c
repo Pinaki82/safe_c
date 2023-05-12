@@ -50,6 +50,7 @@ void writeFormattedOutput(FILE *stream, const char *format, ...) {
 }
 
 int main() { // main function
+  printf("                                            test: sf_strcpy\n");
   char dest[14]; // increased size of dest array
   int calc_out = 0;
   char buffer[100];
@@ -58,23 +59,29 @@ int main() { // main function
   int one_char;
   sf_strcpy(dest, "Hello, safety!", sizeof(dest));
   printf("%s\n", dest);
+  printf("                                            test: sf_strncpy\n");
   sf_strncpy(dest, src, n);
   printf("%s\n", dest);
+  printf("                                            test: sf_gets\n");
 
   if(sf_gets(buffer, sizeof(buffer), stdin) != NULL) { // if buffer is not empty
     printf("You entered: %s", buffer);
   }
 
   printf("%s\n", dest);
+  printf("                                            test: sf_scanf\n");
   int num = 0;
   printf("Enter a number: ");
   sf_scanf("%d", &num, MAXBUFF);
   printf("You entered: %d\n", num);
+  printf("                                            test: sf_getchar\n");
   printf("Enter a character: ");
   one_char = sf_getchar();
   printf("The entered character is : %c\n", one_char);
+  printf("                                            test: sf_strcat\n");
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
+  printf("                                            test: sf_sprintf\n");
   char *string = sf_sprintf("\n%s %d %f", "sf_sprintf", 42, 3.14);
 
   if(string == NULL) {
@@ -84,6 +91,7 @@ int main() { // main function
 
   printf("%s\n", string);
   free(string);
+  printf("                                            test: sf_atoi\n");
 
   if(sf_atoi(dest, &calc_out) == false) { // invalid output = false
     printf("string value = %s, integer value = %d\n", dest, calc_out);
@@ -98,9 +106,12 @@ int main() { // main function
   printf("Please choose an option:\n");
   printf("1. Clear the screen.\n");
   printf("2. Keep the screen as it is.\n");
-  scanf_s("%d", &option);
+  printf("                                            test: sf_scanf\n");
+  sf_scanf("%d", &option, MAXBUFF);
+  //scanf_s("%d", &option);
 
   if(option == 1) {
+    printf("                                            test: sf_cls\n");
     // Code to execute if Option One was chosen
     printf("Clearing the screen.\n");
     sf_cls();
@@ -116,9 +127,12 @@ int main() { // main function
     printf("Invalid option chosen.\n");
   }
 
+  printf("                                            test: sf_holdscr\n");
   // holds the screen using the custom function
   sf_holdscr();
+  printf("                                            test: sf_puts\n");
   sf_puts("Hello, Safety! puts", stdout); // prints "Hello, Safety!\n" to stdout
+  printf("                                            test: sf_puts\n");
   sf_puts("Error message!", stderr); // prints "Error message!\n" to stderr
   FILE *pFile;
   int c;
@@ -131,6 +145,8 @@ int main() { // main function
   }
 
   else {
+    printf("                                            test: sf_getc\n");
+
     do {
       c = sf_getc(pFile, buff2, sizeof(buff2));
 
@@ -146,8 +162,10 @@ int main() { // main function
   char str2split[480] = "Wikipedia: Dark matter is a hypothetical form of matter thought to account for approximately 85% of the matter in the universe. Dark matter is called \"dark\" because it does not appear to interact with the electromagnetic field, which means it does not absorb, reflect, or emit electromagnetic radiation and is, therefore, difficult to detect. Most experts think that dark matter is abundant in the universe and has had a strong influence on its structure and evolution.";
   const char splitter[2] = ".";
   char *token;
+  printf("                                            test: sf_strtok\n");
   /* get the first token */
   token = sf_strtok(str2split, splitter, 500);
+  printf("                                            test: sf_strtok\n");
 
   /* walk through other tokens */
   while(token != NULL) {
@@ -159,18 +177,23 @@ int main() { // main function
   const char s[2] = ",";
   //char *token2, k = '\0';
   //token2 = &k;
+  printf("                                            test: sf_strtok\n");
   token = sf_strtok(str, s, sizeof(str));
+  printf("                                            test: sf_strtok\n");
 
   while(token != NULL) {
     printf(" %s\n", token);
     token = sf_strtok(NULL, s, sizeof(str));
   }
 
+  printf("                                            test: vsprintf_test\n");
   vsprintf_test("%d %c %d", 123, '<', 456);
+  printf("                                            test: vsprintf_test\n");
   vsprintf_test("%s", "This is a string");
   FILE *fp;
   int karctr; // ASCII character
   fp = fopen("../testfile2.txt", "w+"); // open file for writing
+  printf("                                            test: sf_putc\n");
 
   for(karctr = 33 ; karctr <= 100; karctr++) { // loop through the printable ASCII characters
     sf_putc(karctr, fp); // write the character to the file
@@ -182,6 +205,7 @@ int main() { // main function
   fclose(fp);
   printf("See the contents of the file \"testfile2.txt\"\n");
   char krctr_chtype;
+  printf("                                            test: sf_putchar\n");
 
   for(krctr_chtype = '1'; krctr_chtype <= '9'; krctr_chtype++) { // prints 1 to 9
     sf_putchar(krctr_chtype);
@@ -190,27 +214,37 @@ int main() { // main function
   printf("\n");
   const char srcstr[50] = "Terminal";
   char deststr[50];
+  printf("                                            test: sf_strcpy\n");
   sf_strcpy(deststr, "Emulator!", (size_t)sizeof(deststr));
+  printf("                                            test: sf_puts\n");
   sf_puts("deststr: before memcpy: \n", stdout);
+  printf("                                            test: sf_puts\n");
   sf_puts(deststr, stdout);
+  printf("                                            test: sf_memcpy\n");
   /* Copy contents of the source to the destination */
   sf_memcpy(deststr, srcstr, (sf_strlen(srcstr, (size_t)(sizeof(deststr)))));
+  printf("                                            test: sf_puts\n");
   sf_puts("deststr: after sf_memcpy: \n", stdout);
+  printf("                                            test: sf_puts\n");
   sf_puts(deststr, stdout);
   printf("\n");
   char *str_4_strdup_src = "strdupTest";
+  printf("                                            test: strdup\n");
   char *str_4_strdup_target = strdup(str_4_strdup_src);
   printf("%s\n", str_4_strdup_target);
   char *str_4_strndup_src = "strNdupTest";
+  printf("                                            test: strndup\n");
   char *str_4_strndup_target = strndup(str_4_strndup_src, 7);
   printf("%s\n", str_4_strndup_target);
   FILE *file3;
   char str_4_fscanf_1[10], str_4_fscanf_2[10], str_4_fscanf_3[10], str_4_fscanf_4[50];
   file3 = fopen("../testfile3.txt", "w+");
+  printf("                                            test: fputs\n");
   fputs("We are testing fscanfTest\n", file3);
   fclose(file3);
   file3 = fopen("../testfile3.txt", "r");
   rewind(file3);
+  printf("                                            test: sf_fscanf\n");
   sf_fscanf(file3, "%s %s %s %s", str_4_fscanf_1, str_4_fscanf_2, str_4_fscanf_3, str_4_fscanf_4);
   printf("Read String1 |%s|\n", str_4_fscanf_1);
   printf("Read String2 |%s|\n", str_4_fscanf_2);
@@ -220,6 +254,7 @@ int main() { // main function
   char buffer_4_snprintf[50];
   char *s2 = "\"HereIsMyName: Appu.\"";
   printf("Writing %s onto buffer with capacity 15\n", s2);
+  printf("                                            test: sf_snprintf\n");
   int retval01 = sf_snprintf(buffer_4_snprintf, 15, "%s\n", s2);
   printf("String written on buffer = %s\n", buffer_4_snprintf);
   printf("Value returned by sf_snprintf() method = %d\n", retval01);
@@ -227,7 +262,9 @@ int main() { // main function
   char weekday[20], month[20];
   int day, year;
   // Set the date/time string
+  printf("                                            test: sf_strcpy\n");
   sf_strcpy(dtm, "Saturday March 25 1989", MAXCHARSIZE);
+  printf("                                            test: sf_sscanf\n");
 
   // Parse the date/time string using sf_sscanf()
   if(sf_sscanf(dtm, "%s %s %d %d", weekday, month, &day, &year, MAXCHARSIZE) != 4) {
@@ -238,7 +275,9 @@ int main() { // main function
   // Print the parsed date/time values
   printf("%s %d, %d = %s\n", month, day, year, weekday);
   char myname[100] = "Pinaki ", mysurname[] = "Gupta", completename[150] = "" /* initialize dest to an empty string */;
+  printf("                                            test: sf_strcat\n");
   sf_strcat(completename, myname, 150);
+  printf("                                            test: sf_strcat\n");
   sf_strcat(completename, mysurname, 150);
   printf("%s\n", myname);
   printf("%s\n", mysurname);
@@ -252,19 +291,25 @@ int main() { // main function
   const char strtest001[] = "Wikipedia is a multilingual, free, online encyclopedia written and maintained by a community of volunteers.";
   const char ch = ',';
   char *ret;
+  printf("                                            test: sf_strchr\n");
   ret = sf_strchr(strtest001, ch);
   printf("String after |%c| is - |%s|\n", ch, ret);
   char destStrncat[MAX_LENGTH_STRNCAT] = "Hello";
   char srcStrncat[10] = "ChatGPT";
+  printf("                                            test: sf_strncat\n");
   sf_strncat(destStrncat, srcStrncat, MAX_LENGTH_STRNCAT);
   printf("%s\n", destStrncat);
+  printf("                                            test: sf_holdscr\n");
   sf_holdscr();
+  printf("                                            test: sf_assert\n");
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
   printf("This is a test for the fn sf_fflush_out.\n");
+  printf("                                            test: sf_fflush_out\n");
   sf_fflush_out(stdout); // Ensure output is written immediately
   fprintf(stderr, "Error message.\n");
+  printf("                                            test: sf_fflush_out\n");
   sf_fflush_out(stderr); // Ensure output is written immediately
   return 0;
 }

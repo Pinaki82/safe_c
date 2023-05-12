@@ -250,26 +250,29 @@ void *sf_memmove2(void *destn, const void *src, unsigned int n) {
   char *pDest = (char *)destn;
   const char *pSrc = (const char *)src;
 
-  if (src == NULL || !n) {
+  if(src == NULL || !n) {
     fprintf(stderr, "Invalid memmove() call\n");
     return NULL;
   }
 
-  if (destn == NULL) {
+  if(destn == NULL) {
     fprintf(stderr, "Invalid destination buffer\n");
     return NULL;
   }
 
   // Check if source buffer overlaps with destination buffer
-  if (pSrc < pDest && pSrc + n > pDest) {
+  if(pSrc < pDest && pSrc + n > pDest) {
     // Copy backwards to avoid overwriting source buffer
     pSrc += n;
     pDest += n;
-    for (unsigned int i = 0; i < n; i++) {
+
+    for(unsigned int i = 0; i < n; i++) {
       *(--pDest) = *(--pSrc);
     }
-  } else {
-    for (unsigned int i = 0; i < n; i++) {
+  }
+
+  else {
+    for(unsigned int i = 0; i < n; i++) {
       *(pDest + i) = *(pSrc + i);
     }
   }
