@@ -1,4 +1,4 @@
-// Last Change: 2023-05-13  Saturday: 01:43:30 PM
+// Last Change: 2023-05-14  Sunday: 05:42:29 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -82,13 +82,15 @@ int main() { // main function
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
   printf("                                            test: sf_sprintf\n");
-  //char *string = sf_sprintf("\n%s %d %f", "sf_sprintf", 42, 3.14);
-  //if(string == NULL) {
-  //printf("Error: safe_sprintf returned NULL\n");
-  //return 1;
-  //}
-  //printf("%s\n", string);
-  //free(string);
+  char  sprbuff[200], s__2[] = "computer", c__2 = 'l';
+  int   i = 35, j;
+  float flpnt = 1.7320534f;
+  // Format and print various data:
+  j  = sprintf(sprbuff,     "   String:    %201s\n", s__2);   // C4996
+  j += sprintf(sprbuff + j, "   Character: %c\n", c__2);   // C4996
+  j += sprintf(sprbuff + j, "   Integer:   %10d\n", i);   // C4996
+  j += sprintf(sprbuff + j, "   Real:      %5f\n", flpnt);  // C4996
+  printf("Output:\n%s\ncharacter count = %d\n", buffer, j);
   printf("                                            test: sf_atoi\n");
 
   if(sf_atoi(dest, &calc_out) == false) { // invalid output = false
@@ -100,7 +102,7 @@ int main() { // main function
   char lang[5] = "C";
   writing_out(buffer, 100, "%s was created in %s %s\n", lang, fname, lname);
   printf("%s", buffer);
-  int option; /* Options */
+  int option = 0; /* Options */
   printf("Please choose an option:\n");
   printf("1. Clear the screen.\n");
   printf("2. Keep the screen as it is.\n");

@@ -1,4 +1,4 @@
-// Last Change: 2023-05-14  Sunday: 12:51:50 PM
+// Last Change: 2023-05-14  Sunday: 05:27:00 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -74,7 +74,7 @@ int sf_getchar(void);
 char *sf_strcat(char *dest, const char *src, size_t dest_size);
 
 // an alternative function to sprintf() that handles input more appropriately
-char *sf_sprintf(const char *format, ...);
+int sf_sprintf(char *buffer, const char *format, ...);
 
 // an alternative function to atoi() that checks for invalid input
 // if(sf_atoi(str, &result) == false) // invalid output = false
@@ -340,7 +340,7 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   }
 
   // Parse the input using sscanf()
-  int result = sf_sscanf(line, format, arg); /* FIXME: sscanf() insecure */ // FIXME: sf_sscanf. GDB traceback to sf_sscanf
+  int result = sf_sscanf(line, format, arg); /* FIXME: sscanf() insecure */ // SEGFAULT: sf_sscanf. GDB traceback to sf_sscanf
   free(line);
   return result;
 }
@@ -463,40 +463,27 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
 }
 
 // an alternative function to sprintf() that handles input more appropriately
-char *sf_sprintf(const char *format, ...) { // FIXME: problematic fn
+int sf_sprintf(char *buffer, const char *format, ...) {
+  if(buffer == NULL || format == NULL) {
+    return -1;
+  }
+
+  size_t buffer_len = strnlen(buffer, BUFSIZ);
+
+  if(buffer_len == BUFSIZ) {
+    return -1;
+  }
+
   va_list args;
   va_start(args, format);
-  // Determine the size of the formatted string
-  int size = sf_vsnprintf(NULL, 0, format, args); // vsnprintf error // FIXME: vsnprintf() insecure
-
-  if(size < 0) {
-    // vsnprintf encountered an error
-    va_end(args);
-    return NULL;
-  }
-
-  // Allocate memory for the formatted string
-  char *buffer = (char *) malloc((size_t)(size + 1) * sizeof(char));
-
-  //char *buffer = malloc((size + 1) * sizeof(char));
-
-  if(buffer == NULL) {
-    // Memory allocation failed
-    va_end(args);
-    return NULL;
-  }
-
-  // Write the formatted string to the buffer
-  int written = sf_vsnprintf(buffer, (size_t)(size + 1), format, args);
+  int result = vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
   va_end(args);
 
-  if(written < 0 || written > size) {
-    // sf_vsnprintf encountered an error or wrote more characters than expected
-    free(buffer);
-    return NULL;
+  if((size_t)result < 0 || (size_t)result >= BUFSIZ - buffer_len) {
+    return -1;
   }
 
-  return buffer;
+  return (int)((int)buffer_len + result);
 }
 
 // clears the screen safely
@@ -577,7 +564,7 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 
   while(*fmt_ptr && buf_ptr < buf_end) {
     if(*fmt_ptr != '%') {
-      *buf_ptr++ = *fmt_ptr++;
+      *buf_ptr++ = *fmt_ptr++; // SEGFAULT:
       continue;
     }
 
@@ -661,12 +648,26 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
   size_t written = 0;
 
+  if(buffer == NULL) {
+    fprintf(stderr, "Error: buffer is NULL. fn vsnprintf. \n");
+    return (size_t)(-1);
+  }
+
+  if(size == 0) {
+    fprintf(stderr, "Error: size is 0. fn vsnprintf. \n");
+    return (size_t)(-1);
+  }
+
   while(*format) {
     if(*format == '%') {
       format++;
 
       switch(*format) {
         case 'c':
+          if(written >= size) {
+            break;
+          }
+
           buffer[written++] = va_arg(args, int);
           break;
 
@@ -674,26 +675,35 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
             char *s = va_arg(args, char *);
             size_t len = strlen(s);
 
-            if(len > size - written) {
+            if(written + len > size) {
               len = size - written;
             }
 
-            memcpy(buffer + written, s, len);
+            sf_memcpy(buffer + written, s, len + 1);
             written += len;
+            break;
           }
-          break;
 
         case '%':
+          if(written >= size) {
+            break;
+          }
+
           buffer[written++] = '%';
           break;
 
         default:
           // Unknown format specifier.
+          fprintf(stderr, "Error: unknown format specifier. fn vsnprintf. \n");
           return (size_t)(-1);
       }
     }
 
     else {
+      if(written >= size) {
+        break;
+      }
+
       buffer[written++] = *format;
     }
 
@@ -703,6 +713,7 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
   buffer[written] = '\0';
   return written;
 }
+
 
 
 /*
