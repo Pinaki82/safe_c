@@ -1,4 +1,4 @@
-// Last Change: 2023-05-14  Sunday: 05:42:29 PM
+// Last Change: 2023-05-14  Sunday: 06:16:41 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -82,14 +82,14 @@ int main() { // main function
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
   printf("                                            test: sf_sprintf\n");
-  char  sprbuff[200], s__2[] = "computer", c__2 = 'l';
+  char  sprbuff[200] = "", s__2[] = "computer", c__2 = 'l';
   int   i = 35, j;
   float flpnt = 1.7320534f;
   // Format and print various data:
-  j  = sprintf(sprbuff,     "   String:    %201s\n", s__2);   // C4996
-  j += sprintf(sprbuff + j, "   Character: %c\n", c__2);   // C4996
-  j += sprintf(sprbuff + j, "   Integer:   %10d\n", i);   // C4996
-  j += sprintf(sprbuff + j, "   Real:      %5f\n", flpnt);  // C4996
+  j  = sf_sprintf(sprbuff,     "   String:    %205s\n", s__2);   // C4996
+  j += sf_sprintf(sprbuff + j, "   Character: %c\n", c__2);   // C4996
+  j += sf_sprintf(sprbuff + j, "   Integer:   %10d\n", i);   // C4996
+  j += sf_sprintf(sprbuff + j, "   Real:      %5f\n", flpnt);  // C4996
   printf("Output:\n%s\ncharacter count = %d\n", buffer, j);
   printf("                                            test: sf_atoi\n");
 

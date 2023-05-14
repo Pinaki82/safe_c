@@ -1,4 +1,4 @@
-// Last Change: 2023-05-14  Sunday: 05:27:00 PM
+// Last Change: 2023-05-14  Sunday: 06:03:12 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -465,12 +465,14 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
 // an alternative function to sprintf() that handles input more appropriately
 int sf_sprintf(char *buffer, const char *format, ...) {
   if(buffer == NULL || format == NULL) {
+    fprintf(stderr, "sf_sprintf: invalid input\n");
     return -1;
   }
 
   size_t buffer_len = strnlen(buffer, BUFSIZ);
 
   if(buffer_len == BUFSIZ) {
+    fprintf(stderr, "sf_sprintf: buffer is too small\n");
     return -1;
   }
 
@@ -480,6 +482,7 @@ int sf_sprintf(char *buffer, const char *format, ...) {
   va_end(args);
 
   if((size_t)result < 0 || (size_t)result >= BUFSIZ - buffer_len) {
+    fprintf(stderr, "sf_sprintf: buffer overflow\n");
     return -1;
   }
 
