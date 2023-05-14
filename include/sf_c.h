@@ -1,4 +1,4 @@
-// Last Change: 2023-05-13  Saturday: 02:22:08 PM
+// Last Change: 2023-05-14  Sunday: 12:51:50 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -82,6 +82,8 @@ bool sf_atoi(const char *str, int *result);
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
+
+size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
@@ -350,12 +352,10 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) { // F
     return EOF;
   }
 
+  // Get the length of the input string
+  size_t len = strlen(str);
   // Allocate memory for a copy of the string
-  va_list args;
-  va_start(args, format);
-  int result = sf_vsnprintf(NULL, 0, format, args); // FIXME: sf_vsnprintf. GDB traceback to sf_vsnprintf
-  va_end(args);
-  char *str_copy = (char *)malloc((size_t)(result + 1) * sizeof(char));
+  char *str_copy = (char *)malloc(len + 1);
 
   if(!str_copy) {
     // Failed to allocate memory
@@ -363,16 +363,18 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) { // F
   }
 
   // Copy the input string
-  sf_strncpy(str_copy, str, (size_t)(result + 1)); /* FIXME: strncpy() insecure */
-  str_copy[result] = '\0';
+  sf_strncpy(str_copy, str, len + 1);
+  str_copy[len] = '\0';
   // Parse the input using sscanf()
+  va_list args;
   va_start(args, format);
-  result = vsscanf(str_copy, format, args); /* FIXME: vsscanf() insecure */
+  int result = vsscanf(str_copy, format, args); /* INSECURE: vsscanf() insecure */
   va_end(args);
   // Free the memory used by the string copy
   free(str_copy);
   return result;
 }
+
 
 // an alternative function to getchar() that handles input more appropriately
 int sf_getchar(void) {
@@ -573,54 +575,53 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
   char *buf_ptr = buf;
   const char *fmt_ptr = fmt;
 
-  while (*fmt_ptr && buf_ptr < buf_end) {
-    if (*fmt_ptr != '%') {
+  while(*fmt_ptr && buf_ptr < buf_end) {
+    if(*fmt_ptr != '%') {
       *buf_ptr++ = *fmt_ptr++;
       continue;
     }
 
     fmt_ptr++;
 
-    if (*fmt_ptr == '%') {
+    if(*fmt_ptr == '%') {
       *buf_ptr++ = '%';
       fmt_ptr++;
       continue;
     }
 
-    if (*fmt_ptr == '\0') {
+    if(*fmt_ptr == '\0') {
       break;
     }
 
     if(*fmt_ptr == 'd') {
-  int value = va_arg(args, int);
-  char value_buf[13];
-  char *value_ptr = value_buf + sizeof(value_buf) - 1; // start at end of buffer
+      int value = va_arg(args, int);
+      char value_buf[13];
+      char *value_ptr = value_buf + sizeof(value_buf) - 1; // start at end of buffer
 
-  if(value < 0) {
-    *buf_ptr++ = '-';
-    value = -value;
-  }
+      if(value < 0) {
+        *buf_ptr++ = '-';
+        value = -value;
+      }
 
-  // convert integer to string, starting from end of buffer
-  do {
-    *value_ptr-- = value % 10 + '0';
-    value /= 10;
-  } while(value > 0);
+      // convert integer to string, starting from end of buffer
+      do {
+        *value_ptr-- = value % 10 + '0';
+        value /= 10;
+      } while(value > 0);
 
-  // copy string to output buffer
-  while(++value_ptr < value_buf + sizeof(value_buf) && buf_ptr < buf_end) {
-    *buf_ptr++ = *value_ptr;
-  }
+      // copy string to output buffer
+      while(++value_ptr < value_buf + sizeof(value_buf) && buf_ptr < buf_end) {
+        *buf_ptr++ = *value_ptr;
+      }
 
-  fmt_ptr++;
-}
+      fmt_ptr++;
+    }
 
-
-    else if (*fmt_ptr == 's') {
+    else if(*fmt_ptr == 's') {
       char *value = va_arg(args, char *);
       size_t remaining_space = (size_t)(buf_end - buf_ptr + 1); // +1 for null terminator
 
-      if (value == NULL) {
+      if(value == NULL) {
         value = "(null)";
       }
 
@@ -630,7 +631,7 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
       fmt_ptr++;
     }
 
-    else if (*fmt_ptr == 'x') {
+    else if(*fmt_ptr == 'x') {
       unsigned int value = va_arg(args, unsigned int);
       char value_buf[8];
       char *value_ptr = value_buf;
@@ -639,10 +640,10 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
         unsigned int nibble = value & 0xf;
         *value_ptr++ = (char)(nibble + (nibble < 10 ? '0' : 'a' - 10));
         value >>= 4;
-      } while (value > 0 && value_ptr < value_buf + sizeof(value_buf));
+      } while(value > 0 && value_ptr < value_buf + sizeof(value_buf));
 
-      while (value_ptr > value_buf && buf_ptr < buf_end) {
-        *buf_ptr++ = *--value_ptr; // FIXME: segfault
+      while(value_ptr > value_buf && buf_ptr < buf_end) {
+        *buf_ptr++ = *--value_ptr; // SEGFAULT: segfault
       }
 
       fmt_ptr++;
@@ -656,6 +657,53 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
   *buf_ptr = '\0';
   return (int)(buf_ptr - buf);
 }
+
+size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
+  size_t written = 0;
+
+  while(*format) {
+    if(*format == '%') {
+      format++;
+
+      switch(*format) {
+        case 'c':
+          buffer[written++] = va_arg(args, int);
+          break;
+
+        case 's': {
+            char *s = va_arg(args, char *);
+            size_t len = strlen(s);
+
+            if(len > size - written) {
+              len = size - written;
+            }
+
+            memcpy(buffer + written, s, len);
+            written += len;
+          }
+          break;
+
+        case '%':
+          buffer[written++] = '%';
+          break;
+
+        default:
+          // Unknown format specifier.
+          return (size_t)(-1);
+      }
+    }
+
+    else {
+      buffer[written++] = *format;
+    }
+
+    format++;
+  }
+
+  buffer[written] = '\0';
+  return written;
+}
+
 
 /*
    sf_vsprintf - Safely format a variable argument list to a string buffer with size checking.
