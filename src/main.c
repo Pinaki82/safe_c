@@ -1,4 +1,4 @@
-// Last Change: 2023-05-07  Sunday: 01:06:36 AM
+// Last Change: 2023-05-13  Saturday: 01:43:30 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -28,7 +28,7 @@ void vsprintf_test(char const *const format, ...) {
 
   if(NULL != buffer) {
     sf_vsprintf(buffer, (size_t)len, format, args);
-    puts(buffer);
+    sf_puts(buffer, stdout);
     free(buffer);
   }
 
@@ -72,7 +72,7 @@ int main() { // main function
   printf("                                            test: sf_scanf\n");
   int num = 0;
   printf("Enter a number: ");
-  sf_scanf("%d", &num, MAXBUFF);
+  sf_scanf("%d", &num, MAXBUFF); // FIXME:  GDB traceback to sf_scanf -> sf_sscanf -> sf_vsnprintf
   printf("You entered: %d\n", num);
   printf("                                            test: sf_getchar\n");
   printf("Enter a character: ");
@@ -82,15 +82,13 @@ int main() { // main function
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
   printf("                                            test: sf_sprintf\n");
-  char *string = sf_sprintf("\n%s %d %f", "sf_sprintf", 42, 3.14);
-
-  if(string == NULL) {
-    printf("Error: safe_sprintf returned NULL\n");
-    return 1;
-  }
-
-  printf("%s\n", string);
-  free(string);
+  //char *string = sf_sprintf("\n%s %d %f", "sf_sprintf", 42, 3.14);
+  //if(string == NULL) {
+  //printf("Error: safe_sprintf returned NULL\n");
+  //return 1;
+  //}
+  //printf("%s\n", string);
+  //free(string);
   printf("                                            test: sf_atoi\n");
 
   if(sf_atoi(dest, &calc_out) == false) { // invalid output = false

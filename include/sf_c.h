@@ -1,4 +1,4 @@
-// Last Change: 2023-05-09  Tuesday: 05:08:05 AM
+// Last Change: 2023-05-13  Saturday: 02:22:08 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -258,7 +258,7 @@ size_t sf_strlen(const char *str, size_t max_len) {
 }
 
 // an alternative function to strcpy() that checks buffer size as an argument
-void sf_strcpy(char *dest, const char *src, size_t size) { //size=sizeof(dest). Increase size at declaration.
+void sf_strcpy(char *dest, const char *src, size_t size) { //size=sizeof(dest). Increase size at declaration. // FIXME: problematic fn
   /*
     -------------------------------------------------------------------
     dest: a pointer to the destination character array where the copied string will be stored
@@ -276,6 +276,7 @@ void sf_strcpy(char *dest, const char *src, size_t size) { //size=sizeof(dest). 
     or the dest array is full (i.e. i is equal to size - 1).
     -------------------------------------------------------------------
   */
+  size = size + 1;
   size_t i;
 
   for(i = 0; i < size - 1 && src[i] != '\0'; i++) {
@@ -337,13 +338,13 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   }
 
   // Parse the input using sscanf()
-  int result = sscanf(line, format, arg);
+  int result = sf_sscanf(line, format, arg); /* FIXME: sscanf() insecure */ // FIXME: sf_sscanf. GDB traceback to sf_sscanf
   free(line);
   return result;
 }
 
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
-int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
+int sf_sscanf(const char *restrict str, const char *restrict format, ...) { // FIXME: problematic fn
   if(str == NULL || format == NULL) {
     // Invalid input
     return EOF;
@@ -352,9 +353,9 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   // Allocate memory for a copy of the string
   va_list args;
   va_start(args, format);
-  int result = vsnprintf(NULL, 0, format, args); // FIXME: sf_vsnprintf
+  int result = sf_vsnprintf(NULL, 0, format, args); // FIXME: sf_vsnprintf. GDB traceback to sf_vsnprintf
   va_end(args);
-  char *str_copy = (char *)malloc((size_t)result + 1);
+  char *str_copy = (char *)malloc((size_t)(result + 1) * sizeof(char));
 
   if(!str_copy) {
     // Failed to allocate memory
@@ -362,11 +363,11 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   }
 
   // Copy the input string
-  strncpy(str_copy, str, result);
+  sf_strncpy(str_copy, str, (size_t)(result + 1)); /* FIXME: strncpy() insecure */
   str_copy[result] = '\0';
   // Parse the input using sscanf()
   va_start(args, format);
-  result = vsscanf(str_copy, format, args);
+  result = vsscanf(str_copy, format, args); /* FIXME: vsscanf() insecure */
   va_end(args);
   // Free the memory used by the string copy
   free(str_copy);
@@ -460,11 +461,11 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
 }
 
 // an alternative function to sprintf() that handles input more appropriately
-char *sf_sprintf(const char *format, ...) {
+char *sf_sprintf(const char *format, ...) { // FIXME: problematic fn
   va_list args;
   va_start(args, format);
   // Determine the size of the formatted string
-  int size = vsnprintf(NULL, 0, format, args); // vsnprintf error
+  int size = sf_vsnprintf(NULL, 0, format, args); // vsnprintf error // FIXME: vsnprintf() insecure
 
   if(size < 0) {
     // vsnprintf encountered an error
@@ -572,61 +573,64 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
   char *buf_ptr = buf;
   const char *fmt_ptr = fmt;
 
-  while(*fmt_ptr && buf_ptr < buf_end) {
-    if(*fmt_ptr != '%') {
+  while (*fmt_ptr && buf_ptr < buf_end) {
+    if (*fmt_ptr != '%') {
       *buf_ptr++ = *fmt_ptr++;
       continue;
     }
 
     fmt_ptr++;
 
-    if(*fmt_ptr == '%') {
+    if (*fmt_ptr == '%') {
       *buf_ptr++ = '%';
       fmt_ptr++;
       continue;
     }
 
-    if(*fmt_ptr == '\0') {
+    if (*fmt_ptr == '\0') {
       break;
     }
 
     if(*fmt_ptr == 'd') {
-      int value = va_arg(args, int);
-      char value_buf[12];
-      char *value_ptr = value_buf;
+  int value = va_arg(args, int);
+  char value_buf[13];
+  char *value_ptr = value_buf + sizeof(value_buf) - 1; // start at end of buffer
 
-      if(value < 0) {
-        *buf_ptr++ = '-';
-        value = -value;
-      }
+  if(value < 0) {
+    *buf_ptr++ = '-';
+    value = -value;
+  }
 
-      do {
-        *value_ptr++ = value % 10 + '0';
-        value /= 10;
-      } while(value > 0 && value_ptr < value_buf + sizeof(value_buf));
+  // convert integer to string, starting from end of buffer
+  do {
+    *value_ptr-- = value % 10 + '0';
+    value /= 10;
+  } while(value > 0);
 
-      while(value_ptr > value_buf && buf_ptr < buf_end) {
-        *buf_ptr++ = *--value_ptr;
-      }
+  // copy string to output buffer
+  while(++value_ptr < value_buf + sizeof(value_buf) && buf_ptr < buf_end) {
+    *buf_ptr++ = *value_ptr;
+  }
 
-      fmt_ptr++;
-    }
+  fmt_ptr++;
+}
 
-    else if(*fmt_ptr == 's') {
+
+    else if (*fmt_ptr == 's') {
       char *value = va_arg(args, char *);
-      size_t remaining_space = (size_t)(buf_end - buf_ptr);
+      size_t remaining_space = (size_t)(buf_end - buf_ptr + 1); // +1 for null terminator
 
-      if(value == NULL) {
+      if (value == NULL) {
         value = "(null)";
       }
 
-      size_t value_len = strnlen(value, remaining_space);
-      sf_memmove(buf_ptr, value, value_len + 1);  //FIXME: (solved by adding 1) Possible src of error sf_memmove
+      size_t value_len = strnlen(value, remaining_space); // max len should be remaining_space
+      sf_memmove(buf_ptr, value, value_len);
       buf_ptr += value_len;
       fmt_ptr++;
     }
 
-    else if(*fmt_ptr == 'x') {
+    else if (*fmt_ptr == 'x') {
       unsigned int value = va_arg(args, unsigned int);
       char value_buf[8];
       char *value_ptr = value_buf;
@@ -635,10 +639,10 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
         unsigned int nibble = value & 0xf;
         *value_ptr++ = (char)(nibble + (nibble < 10 ? '0' : 'a' - 10));
         value >>= 4;
-      } while(value > 0 && value_ptr < value_buf + sizeof(value_buf));
+      } while (value > 0 && value_ptr < value_buf + sizeof(value_buf));
 
-      while(value_ptr > value_buf && buf_ptr < buf_end) {
-        *buf_ptr++ = *--value_ptr;
+      while (value_ptr > value_buf && buf_ptr < buf_end) {
+        *buf_ptr++ = *--value_ptr; // FIXME: segfault
       }
 
       fmt_ptr++;
@@ -787,7 +791,7 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
 }
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes) {
-  return sf_memmove(to, from, numBytes);
+  return sf_memmove(to, from, (uint32_t)numBytes);
 }
 
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
@@ -803,7 +807,7 @@ char *strdup(const char *s) {
   }
 
   if(p != NULL) {
-    sf_memmove(p, s, size + 1);
+    sf_memmove(p, s, (uint32_t)(size + 1));
   }
 
   else {
@@ -830,7 +834,7 @@ char *strndup(const char *s, size_t n) {
   }
 
   if(p != NULL) {
-    sf_memmove(p, s, n1 + 1);
+    sf_memmove(p, s, (uint32_t)(n1 + 1));
     p[n1] = '\0';
   }
 
@@ -916,15 +920,12 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
     //https://stackoverflow.com/questions/28931379/implementation-of-strtok-function
     //https://github.com/kohn1001/mystrtok/blob/master/strtok.c
   */
-  static char *last_token, *to_free;
+  static char *last_token = NULL, *to_free = NULL;
   int *deli_dict = create_delim_dict(delim, max_len);
 
-  if(!deli_dict || !max_len) {
-    if(to_free) {
-      free(to_free);
-      to_free = NULL;
-    }
-
+  if(!deli_dict || max_len == 0) {
+    free(to_free);
+    to_free = NULL;
     return NULL;
   }
 
@@ -942,13 +943,17 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
     last_token[max_len] = '\0';
   }
 
-  while(deli_dict[(unsigned char)*last_token] && *last_token != '\0') { //https://stackoverflow.com/questions/9972359/warning-array-subscript-has-type-char
+  if(!last_token) {
+    free(deli_dict);
+    deli_dict = NULL;
+    return NULL;
+  }
+
+  while(last_token && deli_dict[(unsigned char)*last_token] && *last_token != '\0') {
     last_token++;
   }
 
-  str = last_token;
-
-  if(*last_token == '\0') {
+  if(!last_token || *last_token == '\0') {
     free(deli_dict);
     deli_dict = NULL;
     free(to_free);
@@ -956,19 +961,18 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
     return NULL;
   }
 
-  while(*last_token != '\0' && !deli_dict[(unsigned char)*last_token]) {
+  str = last_token;
+
+  while(last_token && *last_token != '\0' && !deli_dict[(unsigned char)*last_token]) {
     last_token++;
   }
 
-  if(*last_token != '\0') {
+  if(last_token && *last_token != '\0') {
     *last_token++ = '\0';
   }
 
-  if(deli_dict) {
-    free(deli_dict);
-    deli_dict = NULL;
-  }
-
+  free(deli_dict);
+  deli_dict = NULL;
   return (char *)str;
 }
 
@@ -1063,7 +1067,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
     printf("Source string was truncated to fit the destination buffer\n");
   }
 
-  sf_memmove(dest + dest_len, src, src_len + 1);
+  sf_memmove(dest + dest_len, src, (uint32_t)(src_len + 1));
   dest[dest_len + src_len] = '\0';
   return dest;
 }
@@ -1079,7 +1083,24 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 #define sscanf sf_sscanf
 #define getchar sf_getchar
 #define strcat sf_strcat
-#define vsnprintf sf_vsnprintf
+#define sprintf sf_sprintf
+#define atoi sf_atoi
+/*#define vsnprintf sf_vsnprintf*/
 #define vsprintf sf_vsprintf
+#define vfprintf sf_vfprintf
+#define puts sf_puts
+#define putc sf_putc
+#define putchar sf_putchar
+#define getc sf_getc
+#define memcpy sf_memcpy
+#define fgets sf_fgets
+#define memset sf_memset
+#define vfscanf sf_vfscanf
+#define fscanf sf_fscanf
+#define snprintf sf_snprintf
+#define strchr sf_strchr
+#define strncat sf_strncat
 #define fflush sf_fflush_out
+#define memmove sf_memmove
+#define strlen sf_strlen
 
