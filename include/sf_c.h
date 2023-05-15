@@ -1153,7 +1153,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 #define strcat sf_strcat
 #define sprintf sf_sprintf
 #define atoi sf_atoi
-#define vsnprintf sf_vsnprintf
+/*#define vsnprintf sf_vsnprintf*/
 #define vsprintf sf_vsprintf
 #define vfprintf sf_vfprintf
 #define puts sf_puts
