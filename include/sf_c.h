@@ -1,4 +1,4 @@
-// Last Change: 2023-05-15  Monday: 01:27:54 PM
+// Last Change: 2023-05-15  Monday: 02:23:13 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -478,7 +478,7 @@ int sf_sprintf(char *buffer, const char *format, ...) {
 
   va_list args;
   va_start(args, format);
-  int result = sf_vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
+  int result = (int)sf_vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
   va_end(args);
 
   if((size_t)result < 0 || (size_t)result >= BUFSIZ - buffer_len) {
@@ -653,6 +653,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   char buf[BUFSIZ] = "";
   unsigned int u = '\0';
   size_t len = '\0';
+  double d =  0;
 
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn vsnprintf. \n");
@@ -780,7 +781,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
             break;
           }
 
-          double d = va_arg(args, double);
+          d = va_arg(args, double);
           snprintf(buf, sizeof(buf), "%f", d);
           len = strlen(buf);
 
@@ -815,7 +816,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
           }
 
           int *n = va_arg(args, int *);
-          *n = written;
+          *n = (int)written;
           break;
 
         default:
