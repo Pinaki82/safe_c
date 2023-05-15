@@ -22,7 +22,7 @@ add_executable(safe_c
 
 # Add compiler flags for GCC and Clang
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(safe_c PRIVATE -Wall -Wextra -isystem safeclib/safe_lib.h)
+  target_compile_options(safe_c PRIVATE -save-temps -Wall -Wextra -isystem safeclib/safe_lib.h)
 endif()
 
 # Add compiler flags for MSVC
