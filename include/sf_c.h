@@ -1,4 +1,4 @@
-// Last Change: 2023-05-14  Sunday: 10:53:23 PM
+// Last Change: 2023-05-15  Monday: 12:46:46 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -260,7 +260,7 @@ size_t sf_strlen(const char *str, size_t max_len) {
 }
 
 // an alternative function to strcpy() that checks buffer size as an argument
-void sf_strcpy(char *dest, const char *src, size_t size) { //size=sizeof(dest). Increase size at declaration. // FIXME: problematic fn
+void sf_strcpy(char *dest, const char *src, size_t size) {
   /*
     -------------------------------------------------------------------
     dest: a pointer to the destination character array where the copied string will be stored
@@ -340,13 +340,13 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   }
 
   // Parse the input using sscanf()
-  int result = sf_sscanf(line, format, arg); /* FIXME: sscanf() insecure */ // SEGFAULT: sf_sscanf. GDB traceback to sf_sscanf
+  int result = sf_sscanf(line, format, arg);
   free(line);
   return result;
 }
 
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
-int sf_sscanf(const char *restrict str, const char *restrict format, ...) { // FIXME: problematic fn
+int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   if(str == NULL || format == NULL) {
     // Invalid input
     return EOF;
@@ -1105,7 +1105,7 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
     }
 
     to_free = last_token;
-    sf_strncpy(last_token, str, max_len); /* FIXME: strncpy(). insecure function */
+    sf_strncpy(last_token, str, max_len);
     last_token[max_len] = '\0';
   }
 
@@ -1183,7 +1183,7 @@ int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements require
   va_list args;
   int ret;
   va_start(args, format);
-  ret = sf_vfscanf(fp, format, args); // FIXME: Possible source of problem
+  ret = sf_vfscanf(fp, format, args);
   va_end(args);
   return ret;
 }
