@@ -653,7 +653,6 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
   char buf[BUFSIZ] = "";
   unsigned int u = '\0';
   size_t len = '\0';
-  //double d = '\0';
 
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn vsnprintf. \n");
@@ -705,10 +704,7 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
           }
 
           int i = va_arg(args, int);
-          //char buf[10];
-          //buf[10] = "";
           snprintf(buf, sizeof(buf), "%d", i);
-          //size_t len = strlen(buf);
           len = strlen(buf);
 
           if(written + len > size) {
@@ -724,12 +720,8 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
             break;
           }
 
-          //unsigned int u = va_arg(args, unsigned int);
           u = va_arg(args, unsigned int);
-          //char buf[10];
-          //buf[10] = "";
           snprintf(buf, sizeof(buf), "%u", u);
-          //size_t len = strlen(buf);
           len = strlen(buf);
 
           if(written + len > size) {
@@ -745,12 +737,8 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
             break;
           }
 
-          //unsigned int u = va_arg(args, unsigned int);
           u = va_arg(args, unsigned int);
-          //char buf[10];
-          //buf[10] = "";
           snprintf(buf, sizeof(buf), "%x", u);
-          //size_t len = strlen(buf);
           len = strlen(buf);
 
           if(written + len > size) {
@@ -766,12 +754,8 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
             break;
           }
 
-          //unsigned int u = va_arg(args, unsigned int);
           u = va_arg(args, unsigned int);
-          //char buf[10];
-          //buf[10] = "";
           snprintf(buf, sizeof(buf), "%X", u);
-          //size_t len = strlen(buf);
           len = strlen(buf);
 
           if(written + len > size) {
@@ -788,10 +772,7 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
           }
 
           double d = va_arg(args, double);
-          //char buf[100];
-          //buf[100] = "";
           snprintf(buf, sizeof(buf), "%f", d);
-          //size_t len = strlen(buf);
           len = strlen(buf);
 
           if(written + len > size) {
@@ -807,11 +788,7 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
             break;
           }
 
-          //d = va_arg(args, double);
-          //char buf[100];
-          //buf[100] = "";
           snprintf(buf, sizeof(buf), "%g", d);
-          //size_t len = strlen(buf);
           len = strlen(buf);
 
           if(written + len > size) {
