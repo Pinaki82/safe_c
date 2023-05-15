@@ -1,4 +1,4 @@
-// Last Change: 2023-05-15  Monday: 12:46:46 PM
+// Last Change: 2023-05-15  Monday: 01:06:50 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -478,7 +478,7 @@ int sf_sprintf(char *buffer, const char *format, ...) {
 
   va_list args;
   va_start(args, format);
-  int result = vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
+  int result = sf_vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
   va_end(args);
 
   if((size_t)result < 0 || (size_t)result >= BUFSIZ - buffer_len) {
@@ -664,6 +664,9 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
     return (size_t)(-1);
   }
 
+  /* List of all Format Specifiers in C:
+     https://codeforwin.org/c-programming/list-of-all-format-specifiers-in-c-programming
+   * */
   while(*format) {
     if(*format == '%') {
       format++;
@@ -679,7 +682,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
 
         case 's': {
             char *s = va_arg(args, char *);
-            size_t len = strlen(s);
+            len = strlen(s);
 
             if(written + len > size) {
               len = size - written;
