@@ -1,4 +1,4 @@
-// Last Change: 2023-05-14  Sunday: 06:03:12 PM
+// Last Change: 2023-05-14  Sunday: 10:53:23 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -650,6 +650,10 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
 
 size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
   size_t written = 0;
+  char buf[BUFSIZ] = "";
+  unsigned int u = '\0';
+  size_t len = '\0';
+  //double d = '\0';
 
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn vsnprintf. \n");
@@ -693,6 +697,129 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
           }
 
           buffer[written++] = '%';
+          break;
+
+        case 'd':
+          if(written >= size) {
+            break;
+          }
+
+          int i = va_arg(args, int);
+          //char buf[10];
+          //buf[10] = "";
+          snprintf(buf, sizeof(buf), "%d", i);
+          //size_t len = strlen(buf);
+          len = strlen(buf);
+
+          if(written + len > size) {
+            len = size - written;
+          }
+
+          sf_memcpy(buffer + written, buf, len + 1);
+          written += len;
+          break;
+
+        case 'u':
+          if(written >= size) {
+            break;
+          }
+
+          //unsigned int u = va_arg(args, unsigned int);
+          u = va_arg(args, unsigned int);
+          //char buf[10];
+          //buf[10] = "";
+          snprintf(buf, sizeof(buf), "%u", u);
+          //size_t len = strlen(buf);
+          len = strlen(buf);
+
+          if(written + len > size) {
+            len = size - written;
+          }
+
+          sf_memcpy(buffer + written, buf, len + 1);
+          written += len;
+          break;
+
+        case 'x':
+          if(written >= size) {
+            break;
+          }
+
+          //unsigned int u = va_arg(args, unsigned int);
+          u = va_arg(args, unsigned int);
+          //char buf[10];
+          //buf[10] = "";
+          snprintf(buf, sizeof(buf), "%x", u);
+          //size_t len = strlen(buf);
+          len = strlen(buf);
+
+          if(written + len > size) {
+            len = size - written;
+          }
+
+          sf_memcpy(buffer + written, buf, len + 1);
+          written += len;
+          break;
+
+        case 'X':
+          if(written >= size) {
+            break;
+          }
+
+          //unsigned int u = va_arg(args, unsigned int);
+          u = va_arg(args, unsigned int);
+          //char buf[10];
+          //buf[10] = "";
+          snprintf(buf, sizeof(buf), "%X", u);
+          //size_t len = strlen(buf);
+          len = strlen(buf);
+
+          if(written + len > size) {
+            len = size - written;
+          }
+
+          sf_memcpy(buffer + written, buf, len + 1);
+          written += len;
+          break;
+
+        case 'f':
+          if(written >= size) {
+            break;
+          }
+
+          double d = va_arg(args, double);
+          //char buf[100];
+          //buf[100] = "";
+          snprintf(buf, sizeof(buf), "%f", d);
+          //size_t len = strlen(buf);
+          len = strlen(buf);
+
+          if(written + len > size) {
+            len = size - written;
+          }
+
+          sf_memcpy(buffer + written, buf, len + 1);
+          written += len;
+          break;
+
+        case 'g':
+          if(written >= size) {
+            break;
+          }
+
+          //d = va_arg(args, double);
+          //char buf[100];
+          //buf[100] = "";
+          snprintf(buf, sizeof(buf), "%g", d);
+          //size_t len = strlen(buf);
+          len = strlen(buf);
+
+          if(written + len > size) {
+            len = size - written;
+          }
+
+          sf_memcpy(buffer + written, buf, len + 1);
+          written += len;
           break;
 
         default:
@@ -740,11 +867,11 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  return sf_vsnprintf(dest, dest_size, format, args);
+  return (int)bard_vsnprintf(dest, dest_size, format, args); // BUG: bard_vsnprintf
 }
 
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  int len = sf_vsnprintf(dest, dest_size, format, args);
+  int len = bard_vsnprintf(dest, dest_size, format, args);
   dest[dest_size - 1] = '\0'; // Null-terminate the string
   return len;
 }
@@ -1046,7 +1173,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
     - Finally, it calls vfscanf() to read input from the stream and checks if the file position indicator is within bounds.
   */
   char buffer[BUFSIZ];
-  int n = sf_vsnprintf(buffer, BUFSIZ - 1, format, arg);
+  int n = bard_vsnprintf(buffer, BUFSIZ - 1, format, arg);
 
   if(n < 0 || n >= BUFSIZ) {
     return EOF;
