@@ -38,7 +38,7 @@ void vsprintf_test(char const *const format, ...) {
 void writing_out(char *buf, int buf_size, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
-  my_vsnprintf(buf, (size_t)buf_size, fmt, args);
+  sf_vsnprintf(buf, (size_t)buf_size, fmt, args);
   va_end(args);
 }
 
@@ -229,12 +229,12 @@ int main() { // main function
   sf_puts(deststr, stdout);
   printf("\n");
   char *str_4_strdup_src = "strdupTest";
-  printf("                                            test: strdup\n");
-  char *str_4_strdup_target = strdup(str_4_strdup_src);
+  printf("                                            test: sf_strdup\n");
+  char *str_4_strdup_target = sf_strdup(str_4_strdup_src);
   printf("%s\n", str_4_strdup_target);
   char *str_4_strndup_src = "strNdupTest";
-  printf("                                            test: strndup\n");
-  char *str_4_strndup_target = strndup(str_4_strndup_src, 7);
+  printf("                                            test: sf_strndup\n");
+  char *str_4_strndup_target = sf_strndup(str_4_strndup_src, 7);
   printf("%s\n", str_4_strndup_target);
   FILE *file3;
   char str_4_fscanf_1[10], str_4_fscanf_2[10], str_4_fscanf_3[10], str_4_fscanf_4[50];

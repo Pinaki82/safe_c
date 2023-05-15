@@ -49,22 +49,22 @@ extern "C" {
 #endif
 
 /* Initialization of uninitialized variables */
-void initialize_int_variable(int *variable);
-void initialize_char_variable(char *variable);
-void initialize_float_variable(float *variable);
-void initialize_double_variable(double *variable);
-void initialize_long_variable(long *variable);
-void initialize_long_long_variable(long long *variable);
-void initialize_unsigned_int_variable(unsigned int *variable);
-void initialize_unsigned_char_variable(unsigned char *variable);
-void initialize_unsigned_long_variable(unsigned long *variable);
-void initialize_unsigned_long_long_variable(unsigned long long *variable);
-void initialize_size_t_variable(unsigned long long *variable);
-void initialize_short_variable(short *variable);
-void initialize_unsigned_short_variable(unsigned short *variable);
-void initialize_signed_variable(signed *variable);
-void initialize_unsigned_variable(unsigned *variable);
-void initialize_boolean_variable(bool *variable);
+void sf_initialize_int_variable(int *variable);
+void sf_initialize_char_variable(char *variable);
+void sf_initialize_float_variable(float *variable);
+void sf_initialize_double_variable(double *variable);
+void sf_initialize_long_variable(long *variable);
+void sf_initialize_long_long_variable(long long *variable);
+void sf_initialize_unsigned_int_variable(unsigned int *variable);
+void sf_initialize_unsigned_char_variable(unsigned char *variable);
+void sf_initialize_unsigned_long_variable(unsigned long *variable);
+void sf_initialize_unsigned_long_long_variable(unsigned long long *variable);
+void sf_initialize_size_t_variable(unsigned long long *variable);
+void sf_initialize_short_variable(short *variable);
+void sf_initialize_unsigned_short_variable(unsigned short *variable);
+void sf_initialize_signed_variable(signed *variable);
+void sf_initialize_unsigned_variable(unsigned *variable);
+void sf_initialize_boolean_variable(bool *variable);
 /* Initialization of uninitialized variables (END)*/
 
 void *sf_memmove(void *destn, const void *src, unsigned int n);
@@ -99,12 +99,7 @@ int sf_sprintf(char *buffer, const char *format, ...);
 // if(sf_atoi(str, &result) == false) // invalid output = false
 bool sf_atoi(const char *str, int *result);
 
-// A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
-int sf_vsnprintf_bak(char *buf, size_t size, const char *fmt, va_list args);
-
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
-
-size_t my_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
@@ -157,9 +152,9 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen);
 
 void *sf_memcpy(void *to, const void *from, size_t numBytes);
 
-char *strdup(const char *s);
+char *sf_strdup(const char *s);
 
-char *strndup(const char *s, size_t n);
+char *sf_strndup(const char *s, size_t n);
 
 char *sf_fgets(char *s, int size, FILE *stream);
 
@@ -212,7 +207,7 @@ int *create_delim_dict(const char *delim, size_t max_len);
 
     size_t my_fn(char *buffer, size_t size, const char *format, va_list args) {
     // Check if the buffer is uninitialized.
-    initialize_char_variable(buffer);
+    sf_initialize_char_variable(buffer);
 
     // ...
 
@@ -223,112 +218,112 @@ int *create_delim_dict(const char *delim, size_t max_len);
     return size;
   }
 */
-void initialize_int_variable(int *variable) {
+void sf_initialize_int_variable(int *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_char_variable(char *variable) {
+void sf_initialize_char_variable(char *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0;  //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_float_variable(float *variable) {
+void sf_initialize_float_variable(float *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0.0;  //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_double_variable(double *variable) {
+void sf_initialize_double_variable(double *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0.0;  //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_long_variable(long *variable) {
+void sf_initialize_long_variable(long *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_long_long_variable(long long *variable) {
+void sf_initialize_long_long_variable(long long *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_unsigned_int_variable(unsigned int *variable) {
+void sf_initialize_unsigned_int_variable(unsigned int *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_unsigned_char_variable(unsigned char *variable) {
+void sf_initialize_unsigned_char_variable(unsigned char *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_unsigned_long_variable(unsigned long *variable) {
+void sf_initialize_unsigned_long_variable(unsigned long *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_unsigned_long_long_variable(unsigned long long *variable) {
+void sf_initialize_unsigned_long_long_variable(unsigned long long *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_size_t_variable(unsigned long long *variable) {
+void sf_initialize_size_t_variable(unsigned long long *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_short_variable(short *variable) {
+void sf_initialize_short_variable(short *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_unsigned_short_variable(unsigned short *variable) {
+void sf_initialize_unsigned_short_variable(unsigned short *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_signed_variable(signed *variable) {
+void sf_initialize_signed_variable(signed *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_unsigned_variable(unsigned *variable) {
+void sf_initialize_unsigned_variable(unsigned *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
-void initialize_boolean_variable(bool *variable) {
+void sf_initialize_boolean_variable(bool *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = false; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
@@ -636,7 +631,7 @@ int sf_sprintf(char *buffer, const char *format, ...) {
 
   va_list args;
   va_start(args, format);
-  int result = (int)my_vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
+  int result = (int)sf_vsnprintf(buffer + buffer_len, BUFSIZ - buffer_len, format, args);
   va_end(args);
 
   if(((size_t)result < 0) || ((size_t)result >= (BUFSIZ - buffer_len))) { //WARNING: unsignedLessThanZero: Checking if unsigned expression '(unsigned long long)result' is less than zero.
@@ -696,336 +691,33 @@ bool sf_atoi(const char *str, int *result) {
   return true;
 }
 
-/*
-   sf_vsnprintf - Safely format a variable argument list to a string buffer with size checking.
-
-   This function formats the variable argument list according to the provided format string and writes the resulting string
-   to the provided destination buffer, ensuring that the buffer is not overflowed. The size of the destination buffer
-   must be specified, and the function returns the number of characters that would have been written if there were enough
-   space. If an error occurs, the function returns a negative value.
-
-   Parameters:
-       dest - A pointer to the destination buffer to which the formatted string will be written.
-       dest_size - The size of the destination buffer, in bytes.
-       format - A format string that specifies how the variable argument list should be formatted.
-       args - A variable argument list that contains the values to be formatted.
-
-   Returns:
-       The number of characters that would have been written if there were enough space, excluding the null terminating
-       character. If an error occurs, a negative value is returned.
-
-    Refer to https://en.cppreference.com/w/c/io/vfprintf for more info.
-*/
-
-// A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
-int sf_vsnprintf_bak(char *buf, size_t size, const char *fmt, va_list args) {
-  char *buf_end = buf + size - 1; // leave space for null terminator
-  char *buf_ptr = buf;
-  const char *fmt_ptr = fmt;
-
-  while(*fmt_ptr && buf_ptr < buf_end) {
-    if(*fmt_ptr != '%') {
-      *buf_ptr++ = *fmt_ptr++; // SEGFAULT:
-      continue;
-    }
-
-    fmt_ptr++;
-
-    if(*fmt_ptr == '%') {
-      *buf_ptr++ = '%';
-      fmt_ptr++;
-      continue;
-    }
-
-    if(*fmt_ptr == '\0') {
-      break;
-    }
-
-    if(*fmt_ptr == 'd') {
-      int value = va_arg(args, int);
-      char value_buf[13];
-      char *value_ptr = value_buf + sizeof(value_buf) - 1; // start at end of buffer
-
-      if(value < 0) {
-        *buf_ptr++ = '-';
-        value = -value;
-      }
-
-      // convert integer to string, starting from end of buffer
-      do {
-        *value_ptr-- = value % 10 + '0';
-        value /= 10;
-      } while(value > 0);
-
-      // copy string to output buffer
-      while(++value_ptr < value_buf + sizeof(value_buf) && buf_ptr < buf_end) {
-        *buf_ptr++ = *value_ptr;
-      }
-
-      fmt_ptr++;
-    }
-
-    else if(*fmt_ptr == 's') {
-      char *value = va_arg(args, char *);
-      size_t remaining_space = (size_t)(buf_end - buf_ptr + 1); // +1 for null terminator
-
-      if(value == NULL) {
-        value = "(null)";
-      }
-
-      size_t value_len = strnlen(value, remaining_space); // max len should be remaining_space
-      sf_memmove(buf_ptr, value, (unsigned int)value_len);
-      buf_ptr += value_len;
-      fmt_ptr++;
-    }
-
-    else if(*fmt_ptr == 'x') {
-      unsigned int value = va_arg(args, unsigned int);
-      char value_buf[8];
-      char *value_ptr = value_buf;
-
-      do {
-        unsigned int nibble = value & 0xf;
-        *value_ptr++ = (char)(nibble + (nibble < 10 ? '0' : 'a' - 10));
-        value >>= 4;
-      } while(value > 0 && value_ptr < value_buf + sizeof(value_buf));
-
-      while(value_ptr > value_buf && buf_ptr < buf_end) {
-        *buf_ptr++ = *--value_ptr; // SEGFAULT: segfault
-      }
-
-      fmt_ptr++;
-    }
-
-    else {
-      break;
-    }
-  }
-
-  *buf_ptr = '\0';
-  return (int)(buf_ptr - buf);
-}
-
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
-  size_t written = 0;
-  char buf[BUFSIZ] = "";
-  unsigned int u = '\0';
-  size_t len = '\0';
-  double d =  0;
-
   if(buffer == NULL) {
-    fprintf(stderr, "Error: buffer is NULL. fn vsnprintf. \n");
+    fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf. \n");
     return (size_t)(-1);
   }
 
   if(size == 0) {
-    fprintf(stderr, "Error: size is 0. fn vsnprintf. \n");
-    return (size_t)(-1);
-  }
-
-  /* List of all Format Specifiers in C:
-     https://codeforwin.org/c-programming/list-of-all-format-specifiers-in-c-programming
-   * */
-  while(*format) {
-    if(*format == '%') {
-      format++;
-
-      switch(*format) {
-        case 'c':
-          if(written >= size) {
-            break;
-          }
-
-          buffer[written++] = va_arg(args, int);
-          break;
-
-        case 's': {
-            char *s = va_arg(args, char *);
-            len = strlen(s);
-
-            if(written + len > size) {
-              len = size - written;
-            }
-
-            for(size_t i = 0; i < len; i++) {
-              buffer[written++] = s[i];
-            }
-
-            for(size_t i = 0; i < (20 - len); i++) {
-              buffer[written++] = ' ';
-            }
-
-            break;
-          }
-
-        case '%':
-          if(written >= size) {
-            break;
-          }
-
-          buffer[written++] = '%';
-          break;
-
-        case 'd':
-          if(written >= size) {
-            break;
-          }
-
-          int i = va_arg(args, int);
-          snprintf(buf, sizeof(buf), "%d", i); //INSECURE: snprintf()
-          len = strlen(buf);
-
-          if(written + len > size) {
-            len = size - written;
-          }
-
-          sf_memcpy(buffer + written, buf, len + 1);
-          written += len;
-          break;
-
-        case 'u':
-          if(written >= size) {
-            break;
-          }
-
-          u = va_arg(args, unsigned int);
-          snprintf(buf, sizeof(buf), "%u", u); //INSECURE: snprintf()
-          len = strlen(buf);
-
-          if(written + len > size) {
-            len = size - written;
-          }
-
-          sf_memcpy(buffer + written, buf, len + 1);
-          written += len;
-          break;
-
-        case 'x':
-          if(written >= size) {
-            break;
-          }
-
-          u = va_arg(args, unsigned int);
-          snprintf(buf, sizeof(buf), "%x", u); //INSECURE: snprintf()
-          len = strlen(buf);
-
-          if(written + len > size) {
-            len = size - written;
-          }
-
-          sf_memcpy(buffer + written, buf, len + 1);
-          written += len;
-          break;
-
-        case 'X':
-          if(written >= size) {
-            break;
-          }
-
-          u = va_arg(args, unsigned int);
-          snprintf(buf, sizeof(buf), "%X", u); //INSECURE: snprintf()
-          len = strlen(buf);
-
-          if(written + len > size) {
-            len = size - written;
-          }
-
-          sf_memcpy(buffer + written, buf, len + 1);
-          written += len;
-          break;
-
-        case 'f':
-          if(written >= size) {
-            break;
-          }
-
-          d = va_arg(args, double);
-          snprintf(buf, sizeof(buf), "%f", d); //INSECURE: snprintf()
-          len = strlen(buf);
-
-          if(written + len > size) {
-            len = size - written;
-          }
-
-          sf_memcpy(buffer + written, buf, len + 1);
-          written += len;
-          break;
-
-        case 'g':
-          if(written >= size) {
-            break;
-          }
-
-          snprintf(buf, sizeof(buf), "%g", d); //INSECURE: snprintf()
-          len = strlen(buf);
-
-          if(written + len > size) {
-            len = size - written;
-          }
-
-          sf_memcpy(buffer + written, buf, len + 1);
-          written += len;
-          break;
-
-        // Additional format specifiers
-        case 'n':
-          if(written >= size) {
-            break;
-          }
-
-          int *n = va_arg(args, int *);
-          *n = (int)written;
-          break;
-
-        default:
-          // Unknown format specifier.
-          fprintf(stderr, "Error: unknown format specifier. fn vsnprintf. \n");
-          return (size_t)(-1);
-      }
-    }
-
-    else {
-      if(written >= size) {
-        break;
-      }
-
-      buffer[written++] = *format;
-    }
-
-    format++;
-  }
-
-  buffer[written] = '\0';
-  return written;
-}
-
-size_t my_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
-  if(buffer == NULL) {
-    fprintf(stderr, "Error: buffer is NULL. fn my_vsnprintf. \n");
-    return (size_t)(-1);
-  }
-
-  if(size == 0) {
-    fprintf(stderr, "Error: size is 0. fn my_vsnprintf. \n");
+    fprintf(stderr, "Error: size is 0. fn sf_vsnprintf. \n");
     return (size_t)(-1);
   }
 
   // Check if the buffer is large enough to hold the output.
   if(size < 2) {
-    fprintf(stderr, "Error: buffer is too small. fn my_vsnprintf. \n");
+    fprintf(stderr, "Error: buffer is too small. fn sf_vsnprintf. \n");
     return (size_t)(-1);
   }
 
   // Check if the buffer is uninitialized.
-  initialize_char_variable(buffer);
+  sf_initialize_char_variable(buffer);
   // Check if the size is uninitialized.
-  initialize_size_t_variable(&size);
+  sf_initialize_size_t_variable(&size);
   // Call vsnprintf().
   size_t written = vsnprintf(buffer, size, format, args); /*NOBUG: WRANING: vsnprintf() insecure. Will not be fixed. Wrapper function. Issues addressed. No worry!*/
 
   // Check if the output was truncated.
   if(written >= size) {
-    fprintf(stderr, "Error: output truncated. completed with error. fn my_vsnprintf. \n");
+    fprintf(stderr, "Error: output truncated. completed with error. fn sf_vsnprintf. \n");
     return (size_t)(-1);
   }
 
@@ -1054,11 +746,11 @@ size_t my_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  return (int)my_vsnprintf(dest, dest_size, format, args);
+  return (int)sf_vsnprintf(dest, dest_size, format, args);
 }
 
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  int len = (int)my_vsnprintf(dest, dest_size, format, args);
+  int len = (int)sf_vsnprintf(dest, dest_size, format, args);
   dest[dest_size - 1] = '\0'; // Null-terminate the string
   return len;
 }
@@ -1172,7 +864,7 @@ void *sf_memcpy(void *to, const void *from, size_t numBytes) {
 
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
 
-char *strdup(const char *s) {
+char *sf_strdup(const char *s) {
   size_t size = strlen(s) + 1;
   char *p;
   p = (char *)malloc((size_t)(size) * sizeof(char));
@@ -1194,7 +886,7 @@ char *strdup(const char *s) {
   return p;
 }
 
-char *strndup(const char *s, size_t n) {
+char *sf_strndup(const char *s, size_t n) {
   char *p;
   size_t n1;
 
@@ -1360,7 +1052,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
     - Finally, it calls vfscanf() to read input from the stream and checks if the file position indicator is within bounds.
   */
   char buffer[BUFSIZ];
-  int n = (int)my_vsnprintf(buffer, BUFSIZ - 1, format, arg);
+  int n = (int)sf_vsnprintf(buffer, BUFSIZ - 1, format, arg);
 
   if(n < 0 || n >= BUFSIZ) {
     return EOF;
@@ -1461,7 +1153,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 #define strcat sf_strcat
 #define sprintf sf_sprintf
 #define atoi sf_atoi
-#define vsnprintf my_vsnprintf
+#define vsnprintf sf_vsnprintf
 #define vsprintf sf_vsprintf
 #define vfprintf sf_vfprintf
 #define puts sf_puts
