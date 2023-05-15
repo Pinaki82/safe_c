@@ -81,9 +81,9 @@ int sf_sprintf(char *buffer, const char *format, ...);
 bool sf_atoi(const char *str, int *result);
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
-int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
+int sf_vsnprintf_bak(char *buf, size_t size, const char *fmt, va_list args);
 
-size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
+size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
@@ -560,7 +560,7 @@ bool sf_atoi(const char *str, int *result) {
 */
 
 // A safe version of `vsnprintf()` which ensures that the destination buffer is not null and its size is at least 1.
-int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
+int sf_vsnprintf_bak(char *buf, size_t size, const char *fmt, va_list args) {
   char *buf_end = buf + size - 1; // leave space for null terminator
   char *buf_ptr = buf;
   const char *fmt_ptr = fmt;
@@ -648,7 +648,7 @@ int sf_vsnprintf(char *buf, size_t size, const char *fmt, va_list args) {
   return (int)(buf_ptr - buf);
 }
 
-size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
+size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
   size_t written = 0;
   char buf[BUFSIZ] = "";
   unsigned int u = '\0';
@@ -844,11 +844,11 @@ size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list arg
 
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  return (int)bard_vsnprintf(dest, dest_size, format, args); // BUG: bard_vsnprintf
+  return (int)sf_vsnprintf(dest, dest_size, format, args);
 }
 
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args) {
-  int len = bard_vsnprintf(dest, dest_size, format, args);
+  int len = sf_vsnprintf(dest, dest_size, format, args);
   dest[dest_size - 1] = '\0'; // Null-terminate the string
   return len;
 }
@@ -1150,7 +1150,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
     - Finally, it calls vfscanf() to read input from the stream and checks if the file position indicator is within bounds.
   */
   char buffer[BUFSIZ];
-  int n = bard_vsnprintf(buffer, BUFSIZ - 1, format, arg);
+  int n = sf_vsnprintf(buffer, BUFSIZ - 1, format, arg);
 
   if(n < 0 || n >= BUFSIZ) {
     return EOF;
@@ -1251,7 +1251,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 #define strcat sf_strcat
 #define sprintf sf_sprintf
 #define atoi sf_atoi
-/*#define vsnprintf sf_vsnprintf*/
+#define vsnprintf sf_vsnprintf
 #define vsprintf sf_vsprintf
 #define vfprintf sf_vfprintf
 #define puts sf_puts
