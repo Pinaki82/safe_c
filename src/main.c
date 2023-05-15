@@ -38,7 +38,7 @@ void vsprintf_test(char const *const format, ...) {
 void writing_out(char *buf, int buf_size, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
-  sf_vsnprintf(buf, (size_t)buf_size, fmt, args);
+  my_vsnprintf(buf, (size_t)buf_size, fmt, args);
   va_end(args);
 }
 
