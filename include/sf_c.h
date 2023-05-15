@@ -1,4 +1,4 @@
-// Last Change: 2023-05-15  Monday: 01:06:50 PM
+// Last Change: 2023-05-15  Monday: 01:27:54 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -688,8 +688,14 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
               len = size - written;
             }
 
-            sf_memcpy(buffer + written, s, len + 1);
-            written += len;
+            for(size_t i = 0; i < len; i++) {
+              buffer[written++] = s[i];
+            }
+
+            for(size_t i = 0; i < (20 - len); i++) {
+              buffer[written++] = ' ';
+            }
+
             break;
           }
 
@@ -800,6 +806,16 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
 
           sf_memcpy(buffer + written, buf, len + 1);
           written += len;
+          break;
+
+        // Additional format specifiers
+        case 'n':
+          if(written >= size) {
+            break;
+          }
+
+          int *n = va_arg(args, int *);
+          *n = written;
           break;
 
         default:
