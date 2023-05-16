@@ -1,4 +1,4 @@
-// Last Change: 2023-05-15  Monday: 11:14:23 PM
+// Last Change: 2023-05-16  Tuesday: 10:14:35 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <stdint.h> // for uint8_t
+#include <wchar.h>
 
 
 
@@ -87,6 +88,8 @@ char *sf_gets(char *str, int size, FILE *stream);
 
 // an alternative function to scanf() that checks buffer size as an argument
 int sf_scanf(char *format, void *arg, size_t max_len);
+
+int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list vlist);
 
 // an alternative function to getchar(() that handles input more appropriately
 int sf_getchar(void);
@@ -498,6 +501,43 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   return result;
 }
 
+int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list vlist) {
+  int ret;
+
+  if(!buffer || !format) {
+    fprintf(stderr, "Null pointer or invalid input passed to sf_vsscanf\n");
+    return -1;
+  }
+
+  size_t buffer_len = sf_strlen(buffer, MAXBUFF);
+  size_t format_len = sf_strlen(format, MAXBUFF);
+
+  // Check for empty input
+  if((buffer_len == 0) || (format_len == 0)) {
+    fprintf(stderr, "Buffer or format is empty in sf_vsscanf\n");
+    return -1;
+  }
+
+  // Check for null bytes in the input buffer
+  for(size_t i = 0; i < buffer_len; i++) {
+    if(buffer[i] == '\0') {
+      fprintf(stderr, "Null byte passed to sf_vsscanf\n");
+      return -1;
+    }
+  }
+
+  // Check for invalid input characters
+  for(size_t i = 0; i < format_len; i++) {
+    if(!sf_is_valid_input_char(format[i])) {
+      fprintf(stderr, "Invalid input character passed to sf_vsscanf\n");
+      return -1;
+    }
+  }
+
+  ret = vsscanf(buffer, format, vlist);
+  return ret;
+}
+
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
 int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   if(str == NULL || format == NULL) {
@@ -521,7 +561,7 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   // Parse the input using sscanf()
   va_list args;
   va_start(args, format);
-  int result = vsscanf(str_copy, format, args); /* INSECURE: vsscanf() */
+  int result = sf_vsscanf(str_copy, format, args); /* INSECURE: vsscanf() */ /*BUG: sf_vsscanf() crashes */
   va_end(args);
   // Free the memory used by the string copy
   free(str_copy);
