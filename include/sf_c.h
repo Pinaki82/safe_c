@@ -1,4 +1,4 @@
-// Last Change: 2023-05-16  Tuesday: 11:28:50 PM
+// Last Change: 2023-05-17  Wednesday: 02:55:36 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -181,7 +181,7 @@ int sf_fscanf(FILE *fp, const char *format, ...);
 
 int sf_snprintf(char *dest, size_t dest_size, const char *format, ...);
 
-char *sf_strchr(const char *str, int ch);
+char *sf_strchr(const char *s, int c);
 
 char *sf_strncat(char *dest, const char *src, size_t n);
 
@@ -544,7 +544,7 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
     }
   }
 
-  ret = vsscanf(buffer, format, vlist); //NOBUG: Won't be fixed. Input checked. Wrapper function.
+  ret = vsscanf(buffer, format, vlist); //NOBUG: WARNING: vsscanf() insecure. Won't be fixed. Input checked. Wrapper function.
   return ret;
 }
 
@@ -741,7 +741,7 @@ bool sf_atoi(const char *str, int *result) {
   return true;
 }
 
-size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
+size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) { //TODO: Check if a null byte is passed. Truncate output before sending to vsnprintf()
   //[Wrapper function]
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf. \n");
@@ -1108,23 +1108,32 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
     - Finally, it calls vfscanf() to read input from the stream and checks if the file position indicator is within bounds.
   */
   char buffer[BUFSIZ];
-  int n = (int)sf_vsnprintf(buffer, BUFSIZ - 1, format, arg);
+  va_list arg_copy;
+  va_copy(arg_copy, arg);
+  int n = (int)sf_vsnprintf(buffer, BUFSIZ - 1, format, arg_copy);
+  va_end(arg_copy);
 
   if(n < 0 || n >= BUFSIZ) {
+    fprintf(stderr, "Error: buffer overflow in sf_vfscanf.\n");
     return EOF;
   }
 
-  if(strchr(buffer, '\0') != buffer + n) { //FIXME: sf_strchr() produces illegible output
+  if(sf_strchr(buffer, '\0') != buffer + n) {
+    fprintf(stderr, "Error: Null bytes in sf_vfscanf.\n");
     return EOF;
   }
 
-  int result = vfscanf(stream, format, arg); //NOBUG: Won't be fixed. Input checked. In a wrapper function
+  va_copy(arg_copy, arg);
+  int result = vfscanf(stream, format, arg_copy); //NOBUG: Won't be fixed. Input checked. In a wrapper function
+  va_end(arg_copy);
 
   if(result == EOF) {
+    fprintf(stderr, "Error: Invalid input in sf_vfscanf.\n");
     return EOF;
   }
 
   if(ftell(stream) > BUFSIZ) {
+    fprintf(stderr, "Error: File position indicator out of bounds in sf_vfscanf.\n");
     return EOF;
   }
 
@@ -1134,7 +1143,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
 int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements required. Buff overflow, null bytes, invalid inputs
   // Check for NULL stream and format
   if(fp == NULL || format == NULL) {
-    fprintf(stderr, "Error: Invalid input.\n");
+    fprintf(stderr, "Error: Invalid input passed to sf_fscanf.\n");
     return EOF;
   }
 
@@ -1146,25 +1155,25 @@ int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements require
   return ret;
 }
 
-char *sf_strchr(const char *str, int ch) { //FIXME: Produces illegible output.
-  /*
-    This implementation checks for null pointers and returns NULL
-    if the input string is null. It also checks for buffer overflow by
-    iterating through the string until it finds the null terminator.
-    If it doesn't find the null terminator, then it returns NULL.
-  */
-  if(str == NULL) {
+char *sf_strchr(const char *s, int c) {
+  /* This implementation returns a pointer to the first occurrence
+     of the character c in the string s.
+     If the character is not found, it returns NULL. */
+  if(s == NULL) {
+    fprintf(stderr, "Error: Invalid input passed to my_strchr.\n");
     return NULL;
   }
 
-  const char *p = str;
-
-  while(*p != '\0') {
-    if(*p == ch) {
-      return (char *) p;
+  while(*s != '\0') {
+    if(*s == (char)c) {
+      return (char *)s;
     }
 
-    p++;
+    s++;
+  }
+
+  if(c == '\0') {
+    return (char *)s;
   }
 
   return NULL;
