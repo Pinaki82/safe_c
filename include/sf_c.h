@@ -1,4 +1,4 @@
-// Last Change: 2023-05-16  Tuesday: 11:10:34 PM
+// Last Change: 2023-05-16  Tuesday: 11:16:11 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -512,8 +512,8 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
     return -1;
   }
 
-  size_t buffer_len = sf_strlen(buffer, MAXBUFF);
-  size_t format_len = sf_strlen(format, MAXBUFF);
+  size_t buffer_len = sf_strlen(buffer, MAX_BUFFER_LEN);
+  size_t format_len = sf_strlen(format, MAX_FORMAT_LEN);
 
   // Check for out of bounds
   if(buffer_len >= MAX_BUFFER_LEN || format_len >= MAX_FORMAT_LEN) {
