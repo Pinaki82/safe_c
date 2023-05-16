@@ -1,4 +1,4 @@
-// Last Change: 2023-05-16  Tuesday: 10:14:35 PM
+// Last Change: 2023-05-16  Tuesday: 11:10:34 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -15,6 +15,9 @@
 #endif
 
 #define DICT_LEN 256 // needed by create_delim_dict()
+
+#define MAX_BUFFER_LEN 4096 // needed by sf_vsscanf()
+#define MAX_FORMAT_LEN 4096 // needed by sf_vsscanf()
 
 #include <math.h>
 #include <stdio.h>
@@ -511,6 +514,12 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
 
   size_t buffer_len = sf_strlen(buffer, MAXBUFF);
   size_t format_len = sf_strlen(format, MAXBUFF);
+
+  // Check for out of bounds
+  if(buffer_len >= MAX_BUFFER_LEN || format_len >= MAX_FORMAT_LEN) {
+    fprintf(stderr, "Buffer or format is too large in sf_vsscanf\n");
+    return -1;
+  }
 
   // Check for empty input
   if((buffer_len == 0) || (format_len == 0)) {
