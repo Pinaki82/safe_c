@@ -48,6 +48,8 @@
 extern "C" {
 #endif
 
+int sf_is_valid_input_char(char c);
+
 /* Initialization of uninitialized variables */
 void sf_initialize_int_variable(int *variable);
 void sf_initialize_char_variable(char *variable);
@@ -188,8 +190,6 @@ char *sf_strncat(char *dest, const char *src, size_t n);
 
 /* A backup function for snprintf() that uses another safe version of vsnprintf(). */
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
-
-int is_valid_input_char(char c);
 
 int *create_delim_dict(const char *delim, size_t max_len);
 
@@ -456,7 +456,7 @@ void sf_strncpy(char *dest, const char *src, size_t n) {
 
 // an alternative function to gets() that checks buffer size as an argument
 char *sf_gets(char *str, int size, FILE *stream) { //size=sizeof(dest).
-  if(fgets(str, size, stream) == NULL) { //fgets() returns NULL when the end of the file is reached
+  if(sf_fgets(str, size, stream) == NULL) { //fgets() returns NULL when the end of the file is reached
     return NULL;
   }
 
@@ -478,14 +478,14 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   // Read a line of input from stdin
   char *line = (char *)malloc(max_len + 1);
 
-  if(!fgets(line, (int)(max_len + 1), stdin)) {
+  if(!sf_fgets(line, (int)(max_len + 1), stdin)) {
     // Error reading input
     free(line);
     return EOF;
   }
 
   // Check if input exceeded max length
-  if(strlen(line) == max_len && line[max_len - 1] != '\n') {
+  if(sf_strlen(line, MAXBUFF) == max_len && line[max_len - 1] != '\n') {
     // Input exceeded max length
     fprintf(stderr, "Input exceeded maximum length of %zu characters\n", max_len);
     free(line);
@@ -506,7 +506,7 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   }
 
   // Get the length of the input string
-  size_t len = strlen(str);
+  size_t len = sf_strlen(str, MAXBUFF);
   // Allocate memory for a copy of the string
   char *str_copy = (char *)malloc(len + 1);
 
@@ -576,9 +576,9 @@ int sf_getchar(void) {
 // an alternative function to strcat() that handles input more appropriately
 char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   // Get the length of the destination string
-  size_t dest_len = strlen(dest);
+  size_t dest_len = sf_strlen(dest, MAXBUFF);
   // Get the length of the source string
-  size_t src_len = strlen(src);
+  size_t src_len = sf_strlen(src, MAXBUFF);
 
   // Check if there is enough space in the destination buffer to append the source string
   if(dest_size - (dest_len + 1) <= src_len) {
@@ -692,6 +692,7 @@ bool sf_atoi(const char *str, int *result) {
 }
 
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
+  //[Wrapper fn]
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf. \n");
     return (size_t)(-1);
@@ -832,7 +833,7 @@ int sf_putchar(int c) {
   return putchar(c);  // safe to write to stdout
 }
 
-int is_valid_input_char(char c) {
+int sf_is_valid_input_char(char c) {
   return isprint((unsigned char) c);
 }
 
@@ -848,7 +849,7 @@ int sf_getc(FILE *stream, char *buffer, size_t buflen) {
     return EOF;
   }
 
-  if(is_valid_input_char((char)c)) {
+  if(sf_is_valid_input_char((char)c)) {
     buffer[0] = (char) c;
     buffer[1] = '\0';
     return c;
@@ -865,7 +866,7 @@ void *sf_memcpy(void *to, const void *from, size_t numBytes) {
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
 
 char *sf_strdup(const char *s) {
-  size_t size = strlen(s) + 1;
+  size_t size = sf_strlen(s, MAXBUFF) + 1;
   char *p;
   p = (char *)malloc((size_t)(size) * sizeof(char));
 
@@ -927,7 +928,7 @@ char *sf_fgets(char *s, int size, FILE *stream) {
   }
 
   // Remove the newline character at the end, if present
-  size_t len = strlen(s);
+  size_t len = sf_strlen(s, MAXBUFF);
 
   if(len > 0 && s[len - 1] == '\n') {
     s[len - 1] = '\0';
@@ -1058,7 +1059,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
     return EOF;
   }
 
-  if(strchr(buffer, '\0') != buffer + n) {
+  if(strchr(buffer, '\0') != buffer + n) { //FIXME: sf_strchr() produces illegible output
     return EOF;
   }
 
@@ -1090,7 +1091,7 @@ int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements require
   return ret;
 }
 
-char *sf_strchr(const char *str, int ch) {
+char *sf_strchr(const char *str, int ch) { //FIXME: Produces illegible output.
   /*
     This implementation checks for null pointers and returns NULL
     if the input string is null. It also checks for buffer overflow by
@@ -1153,7 +1154,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 #define strcat sf_strcat
 #define sprintf sf_sprintf
 #define atoi sf_atoi
-/*#define vsnprintf sf_vsnprintf*/
+#define vsnprintf sf_vsnprintf
 #define vsprintf sf_vsprintf
 #define vfprintf sf_vfprintf
 #define puts sf_puts
@@ -1170,5 +1171,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 #define strncat sf_strncat
 #define fflush sf_fflush_out
 #define memmove sf_memmove
-#define strlen sf_strlen
+#define strdup sf_strdup
+#define strndup sf_strndup
+#define is_valid_input_char sf_is_valid_input_char
 
