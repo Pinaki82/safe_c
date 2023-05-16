@@ -1,4 +1,4 @@
-// Last Change: 2023-05-16  Tuesday: 11:16:11 PM
+// Last Change: 2023-05-16  Tuesday: 11:28:50 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -505,6 +505,7 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
 }
 
 int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list vlist) {
+  //[Wrapper function]
   int ret;
 
   if(!buffer || !format) {
@@ -543,7 +544,7 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
     }
   }
 
-  ret = vsscanf(buffer, format, vlist);
+  ret = vsscanf(buffer, format, vlist); //NOBUG: Won't be fixed. Input checked. Wrapper function.
   return ret;
 }
 
@@ -570,7 +571,7 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   // Parse the input using sscanf()
   va_list args;
   va_start(args, format);
-  int result = sf_vsscanf(str_copy, format, args); /* INSECURE: vsscanf() */ /*BUG: sf_vsscanf() crashes */
+  int result = sf_vsscanf(str_copy, format, args);
   va_end(args);
   // Free the memory used by the string copy
   free(str_copy);
@@ -741,7 +742,7 @@ bool sf_atoi(const char *str, int *result) {
 }
 
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {
-  //[Wrapper fn]
+  //[Wrapper function]
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf. \n");
     return (size_t)(-1);
@@ -763,7 +764,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   // Check if the size is uninitialized.
   sf_initialize_size_t_variable(&size);
   // Call vsnprintf().
-  size_t written = vsnprintf(buffer, size, format, args); /*NOBUG: WRANING: vsnprintf() insecure. Will not be fixed. Wrapper function. Issues addressed. No worry!*/
+  size_t written = (size_t)vsnprintf(buffer, size, format, args); /*NOBUG: WRANING: vsnprintf() insecure. Will not be fixed. Wrapper function. Issues addressed. No worry!*/
 
   // Check if the output was truncated.
   if(written >= size) {
@@ -833,7 +834,7 @@ void sf_fflush_out(FILE *stream) {
 
 
 int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
-  //[Wrapper fn]
+  //[Wrapper function]
   // Check for a null file pointer
   if(!stream) {
     return -1;
@@ -876,7 +877,7 @@ int sf_putc(int c, FILE *stream) {
 }
 
 int sf_putchar(int c) {
-  //[Wrapper fn]
+  //[Wrapper function]
   if(!isprint(c) || c == '\n' || c == '\r' || c == '\t') {
     return EOF;  // reject non-printable characters and control characters
   }
@@ -889,7 +890,7 @@ int sf_is_valid_input_char(char c) {
 }
 
 int sf_getc(FILE *stream, char *buffer, size_t buflen) {
-  //[Wrapper fn]
+  //[Wrapper function]
   if(!buffer || buflen == 0) {
     return EOF;
   }
@@ -927,7 +928,7 @@ char *sf_strdup(const char *s) {
     exit(EXIT_FAILURE);
   }
 
-  if(p != NULL) { //WARNING: condition p!=NULL always true
+  if(p != NULL) { //NOBUG: WARNING: condition p!=NULL always true. False flag: The condition is there for making the function failsafe.
     sf_memmove(p, s, (uint32_t)(size + 1));
   }
 
@@ -954,7 +955,7 @@ char *sf_strndup(const char *s, size_t n) {
     exit(EXIT_FAILURE);
   }
 
-  if(p != NULL) { //WARNING: condition p!=NULL always true
+  if(p != NULL) { //NOBUG: WARNING: condition p!=NULL always true. False flag: The condition is there for making the function failsafe.
     sf_memmove(p, s, (uint32_t)(n1 + 1));
     p[n1] = '\0';
   }
@@ -968,7 +969,7 @@ char *sf_strndup(const char *s, size_t n) {
 }
 
 char *sf_fgets(char *s, int size, FILE *stream) {
-  //[Wrapper fn]
+  //[Wrapper function]
   if(size <= 0) {
     fprintf(stderr, "Error: Invalid buffer size.\n");
     return NULL;
@@ -1099,7 +1100,7 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
 }
 
 int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
-  //[Wrapper fn]
+  //[Wrapper function]
   /*
     - The function first formats the input string using vsnprintf() and stores it in a buffer.
     - It then checks for buffer overflow by comparing the length of the formatted string with the size of the buffer.
