@@ -784,6 +784,7 @@ void sf_fflush_out(FILE *stream) {
 
 
 int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
+  //[Wrapper fn]
   // Check for a null file pointer
   if(!stream) {
     return -1;
@@ -826,6 +827,7 @@ int sf_putc(int c, FILE *stream) {
 }
 
 int sf_putchar(int c) {
+  //[Wrapper fn]
   if(!isprint(c) || c == '\n' || c == '\r' || c == '\t') {
     return EOF;  // reject non-printable characters and control characters
   }
@@ -838,6 +840,7 @@ int sf_is_valid_input_char(char c) {
 }
 
 int sf_getc(FILE *stream, char *buffer, size_t buflen) {
+  //[Wrapper fn]
   if(!buffer || buflen == 0) {
     return EOF;
   }
@@ -916,6 +919,7 @@ char *sf_strndup(const char *s, size_t n) {
 }
 
 char *sf_fgets(char *s, int size, FILE *stream) {
+  //[Wrapper fn]
   if(size <= 0) {
     fprintf(stderr, "Error: Invalid buffer size.\n");
     return NULL;
@@ -1046,6 +1050,7 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
 }
 
 int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
+  //[Wrapper fn]
   /*
     - The function first formats the input string using vsnprintf() and stores it in a buffer.
     - It then checks for buffer overflow by comparing the length of the formatted string with the size of the buffer.
@@ -1140,38 +1145,4 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
   dest[dest_len + src_len] = '\0';
   return dest;
 }
-
-
-
-
-#define strlen sf_strlen
-#define strcpy sf_strcpy
-#define strncpy sf_strncpy
-#define gets sf_gets
-#define scanf sf_scanf
-#define sscanf sf_sscanf
-#define getchar sf_getchar
-#define strcat sf_strcat
-#define sprintf sf_sprintf
-#define atoi sf_atoi
-#define vsnprintf sf_vsnprintf
-#define vsprintf sf_vsprintf
-#define vfprintf sf_vfprintf
-#define puts sf_puts
-#define putc sf_putc
-#define putchar sf_putchar
-#define getc sf_getc
-#define memcpy sf_memcpy
-#define fgets sf_fgets
-#define memset sf_memset
-#define vfscanf sf_vfscanf
-#define fscanf sf_fscanf
-#define snprintf sf_snprintf
-#define strchr sf_strchr
-#define strncat sf_strncat
-#define fflush sf_fflush_out
-#define memmove sf_memmove
-#define strdup sf_strdup
-#define strndup sf_strndup
-#define is_valid_input_char sf_is_valid_input_char
 
