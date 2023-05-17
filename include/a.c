@@ -10,7 +10,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
-#include <unistd.h>
+
 #include <stdint.h> // for uint8_t
 
 size_t bard_vsnprintf(char *buffer, size_t size, const char *format, va_list args);

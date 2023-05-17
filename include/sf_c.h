@@ -31,7 +31,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
-#include <unistd.h>
+//#include <unistd.h> // compiles fine without it
 #include <stdint.h> // for uint8_t
 #include <wchar.h>
 
