@@ -65,6 +65,7 @@ splint_output.txt
 cppcheck_output.txt
 tags
 /tests
+/lsp_files
 *.orig
 *.bak
 Personal.txt
