@@ -1,10 +1,14 @@
-// Last Change: 2023-05-17  Wednesday: 02:55:36 AM
+// Last Change: 2023-05-17  Wednesday: 11:22:43 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
 
 #ifndef  __SF_C_H__
 #define  __SF_C_H__
+
+#ifndef errno_t
+  typedef int errno_t;
+#endif
 
 
 //MACRO, global variables, etc..
@@ -31,7 +35,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
-//#include <unistd.h> // compiles fine without it
+#include <unistd.h> //TODO: Try compiling without it
 #include <stdint.h> // for uint8_t
 #include <wchar.h>
 
@@ -65,7 +69,7 @@ void sf_initialize_unsigned_int_variable(unsigned int *variable);
 void sf_initialize_unsigned_char_variable(unsigned char *variable);
 void sf_initialize_unsigned_long_variable(unsigned long *variable);
 void sf_initialize_unsigned_long_long_variable(unsigned long long *variable);
-void sf_initialize_size_t_variable(unsigned long long *variable);
+void sf_initialize_size_t_variable(size_t *variable);
 void sf_initialize_short_variable(short *variable);
 void sf_initialize_unsigned_short_variable(unsigned short *variable);
 void sf_initialize_signed_variable(signed *variable);
@@ -294,7 +298,7 @@ void sf_initialize_unsigned_long_long_variable(unsigned long long *variable) {
   }
 }
 
-void sf_initialize_size_t_variable(unsigned long long *variable) {
+void sf_initialize_size_t_variable(size_t *variable) {
   if(variable == NULL) {
     // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
@@ -586,11 +590,11 @@ int sf_getchar(void) {
   static int n = 0;
 
   if(n == 0) {
-    n = read(0, buf, sizeof buf);
+    fgets(buf, sizeof(buf), stdin);
     bufp = buf;
   }
 
-  if(--n >= 0) {
+  if(*bufp != '\0') {
     return *bufp++;
   }
 
@@ -718,10 +722,7 @@ void sf_cls(void) {
 }
 #else  // For Linux and Mac
 void sf_cls(void) {
-  initscr();
-  clear();
-  refresh();
-  endwin();
+  system("clear");
 }
 #endif
 
@@ -822,7 +823,7 @@ void sf_holdscr(void) {
   /* prints a message to the console, flushes the buffer, and then reads a single character from the user input without echoing it to the terminal using the read command. Finally, it prints a newline character to ensure the cursor is on a new line before continuing. */
   printf("Press any key to continue...");
   fflush(stdout);
-  system("read -rsn1"); // Linux. command explanation: `read` was used to read from stdin, `-p` means that the user will be prompted for input.  // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+  system("read ans"); // Linux. command explanation: `read` was used to read from stdin, `-p` means that the user will be prompted for input.  // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
   printf("\n");
 #endif
 }

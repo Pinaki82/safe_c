@@ -1,8 +1,9 @@
-// Last Change: 2023-05-14  Sunday: 06:16:41 PM
+// Last Change: 2023-05-17  Wednesday: 11:14:18 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h> // Include the necessary header for vswprintf
 #include "sf_c.h"
 
 #ifndef  MAXBUFF
@@ -53,7 +54,8 @@ void vsprintf_test(char const *const format, ...) {
   int len;
   char *buffer;
   va_start(args, format);
-  len = _vscprintf(format, args)   // _vscprintf doesn't count
+  //len = _vscprintf(format, args)   // _vscprintf doesn't count
+  len = vswprintf(NULL, 0, format, args) // Calculate the required buffer size
         + 1; // terminating '\0'
   buffer = (char *) malloc((size_t)len * sizeof(char));
 
@@ -94,6 +96,7 @@ int main() { // main function
   sf_strncpy(dest, src, n);
   printf("%s\n", dest);
   printf("                                            test: sf_gets\n");
+  printf("Type something and hit Enter\n");
 
   if(sf_gets(buffer, sizeof(buffer), stdin) != NULL) { // if buffer is not empty
     printf("You entered: %s", buffer);
@@ -105,10 +108,22 @@ int main() { // main function
   printf("Enter a number: ");
   sf_scanf("%d", &num, MAXBUFF); // FIXME:  GDB traceback to sf_scanf -> sf_sscanf -> sf_vsnprintf
   printf("You entered: %d\n", num);
+  // Clear the input buffer.
+  //while ((getchar()) != '\n');
+  // Clear the input buffer.
+  int bytes_read = read(0, NULL, 100);
   printf("                                            test: sf_getchar\n");
+  // Clear the input buffer.
+  //while ((getchar()) != '\n');
+  // Clear the input buffer.
+  bytes_read = read(0, NULL, 100);
   printf("Enter a character: ");
   one_char = sf_getchar();
   printf("The entered character is : %c\n", one_char);
+  // Clear the input buffer.
+  //while ((getchar()) != '\n');
+  // Clear the input buffer.
+  bytes_read = read(0, NULL, 100);
   printf("                                            test: sf_strcat\n");
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);

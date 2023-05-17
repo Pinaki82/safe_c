@@ -72,4 +72,7 @@ Personal.txt
 chat-gpt-insecure-c-functions-flagged.html
 chat-gpt-alternative-to-system.html
 chat-gpt-buffer-overflow-vulnerability.html
-
+tst.sh
+testfile2.txt
+testfile3.txt
+testfile4.txt
