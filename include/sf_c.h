@@ -1,4 +1,4 @@
-// Last Change: 2023-05-17  Wednesday: 11:22:43 PM
+// Last Change: 2023-05-18  Thursday: 02:09:31 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -122,7 +122,7 @@ int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
 int sf_sscanf(const char *restrict str, const char *restrict format, ...);
 
-int sf_flush_input_buffer();
+int sf_flush_input_buffer(void);
 
 // function: holds the screen before the text disappears
 void sf_holdscr(void);
@@ -831,10 +831,10 @@ int sf_snprintf(char *dest, size_t dest_size, const char *format, ...) {
   return len;
 }
 
-int sf_flush_input_buffer() { // Clear the input buffer.
+int sf_flush_input_buffer(void) { // Clear the input buffer.
   while((sf_getchar()) != '\n');
 
-  int bytes_read = read(0, NULL, 100);
+  int bytes_read = (int)read(0, NULL, 100);
   return bytes_read;
 }
 
@@ -865,7 +865,7 @@ int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
   }
 
   // Call vfprintf() with the given arguments
-  return vfprintf(stream, format, ap);
+  return vfprintf(stream, format, ap); //NOBUG: False flag: 'format' is not a string-literal
 }
 
 void sf_puts(const char *s, FILE *stream) {
@@ -1149,6 +1149,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
 
   va_copy(arg_copy, arg);
   int result = vfscanf(stream, format, arg_copy); //NOBUG: Won't be fixed. Input checked. In a wrapper function
+  //NOBUG: False flag: 'format' is not a string-literal
   va_end(arg_copy);
 
   if(result == EOF) {
