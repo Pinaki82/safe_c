@@ -23,7 +23,6 @@
 #define snprintf sf_snprintf
 #define strchr sf_strchr
 #define strncat sf_strncat
-#define fflush sf_fflush_out
 #define memmove sf_memmove
 #define strdup sf_strdup
 #define strndup sf_strndup

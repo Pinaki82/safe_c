@@ -1,4 +1,4 @@
-// Last Change: 2023-05-18  Thursday: 02:09:31 PM
+// Last Change: 2023-05-18  Thursday: 10:12:02 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -27,7 +27,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>  // for size_t, sf_strchr()
+#include <stddef.h>  // for size_t, sf_strchr(), SIZE_MAX
 #include <string.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/file-constants?view=msvc-170
 #include <fcntl.h>
@@ -208,6 +208,8 @@ int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va
 
 int *create_delim_dict(const char *delim, size_t max_len);
 
+size_t calculate_required_size(const char *format, va_list args);
+
 /* Fn definitions start here */
 
 /*
@@ -234,113 +236,97 @@ int *create_delim_dict(const char *delim, size_t max_len);
   }
 */
 void sf_initialize_int_variable(int *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_char_variable(char *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0;  //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+  if(*variable == '\0') { // Variable is uninitialized. Initialize it to a default value.
+    *variable = ' '; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_float_variable(float *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0.0;  //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+  if(*variable == 0.0) { // Variable is uninitialized. Initialize it to a default value.
+    *variable = 0.0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_double_variable(double *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0.0;  //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+  if(*variable == 0.0) { // Variable is uninitialized. Initialize it to a default value.
+    *variable = 0.0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_long_variable(long *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_long_long_variable(long long *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_unsigned_int_variable(unsigned int *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) {
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_unsigned_char_variable(unsigned char *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_unsigned_long_variable(unsigned long *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_unsigned_long_long_variable(unsigned long long *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_size_t_variable(size_t *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
+    *variable = 1; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_short_variable(short *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_unsigned_short_variable(unsigned short *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_signed_variable(signed *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_unsigned_variable(unsigned *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
     *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
 
 void sf_initialize_boolean_variable(bool *variable) {
-  if(variable == NULL) {
-    // Variable is uninitialized. Initialize it to a default value.
+  if(!*variable) { // Variable is uninitialized. Initialize it to a default value.
     *variable = false; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
   }
 }
@@ -747,21 +733,25 @@ bool sf_atoi(const char *str, int *result) {
   return true;
 }
 
-size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) { //TODO: Check if a null byte is passed. Truncate output before sending to vsnprintf()
+// Function to calculate the required buffer size for vsnprintf
+size_t calculate_required_size(const char *format, va_list args) {
+  va_list args_copy;
+  va_copy(args_copy, args);
+  int required_size = vsnprintf(NULL, 0, format, args_copy);
+  va_end(args_copy);
+  return (required_size >= 0) ? (size_t)(required_size + 1) : 0;  // Add 1 for null terminator
+}
+
+
+size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {//TODO: Check if a null byte is passed. Truncate output before sending to vsnprintf()
   //[Wrapper function]
   if(buffer == NULL) {
-    fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf. \n");
+    fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
 
   if(size == 0) {
-    fprintf(stderr, "Error: size is 0. fn sf_vsnprintf. \n");
-    return (size_t)(-1);
-  }
-
-  // Check if the buffer is large enough to hold the output.
-  if(size < 2) {
-    fprintf(stderr, "Error: buffer is too small. fn sf_vsnprintf. \n");
+    fprintf(stderr, "Error: size is 0. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
 
@@ -769,25 +759,21 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   sf_initialize_char_variable(buffer);
   // Check if the size is uninitialized.
   sf_initialize_size_t_variable(&size);
+  // Calculate the required size
+  size_t required_size = calculate_required_size(format, args);
 
-  // Check for null bytes in the input buffer and replace them with a whitespace char
-  for(size_t i = 0; i < sizeof(size); i++) {
-    if((buffer[i] == '\0') || (!isprint(buffer[i]))) {
-      buffer[i] = ' ';
-    }
-  }
-
-  // Call vsnprintf().
-  /*TODO: truncate before sending to vsnprintf() */
-  size_t written = (size_t)vsnprintf(buffer, size, format, args); /*NOBUG: WRANING: vsnprintf() insecure. Will not be fixed. Wrapper function. Issues addressed. No worry!*/
-
-  // Check if the output was truncated.
-  if(written >= size) {
-    fprintf(stderr, "Error: output truncated. completed with error. fn sf_vsnprintf. \n");
+  if(required_size == 0) {
+    fprintf(stderr, "Error: Failed to calculate required size. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
 
-  // Return the number of characters written.
+  // Truncate the output if the buffer size is insufficient
+  size_t written = (required_size <= size) ? required_size : size - 1;
+  // Call vsnprintf().
+  written = (size_t)vsnprintf(buffer, written + 1, format, args);
+  // Ensure null termination
+  buffer[written] = '\0';
+  // Return the number of characters that would have been written if the buffer had sufficient size
   return written;
 }
 
