@@ -769,7 +769,16 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   sf_initialize_char_variable(buffer);
   // Check if the size is uninitialized.
   sf_initialize_size_t_variable(&size);
+
+  // Check for null bytes in the input buffer and replace them with a whitespace char
+  for(size_t i = 0; i < sizeof(size); i++) {
+    if((buffer[i] == '\0') || (!isprint(buffer[i]))) {
+      buffer[i] = ' ';
+    }
+  }
+
   // Call vsnprintf().
+  /*TODO: truncate before sending to vsnprintf() */
   size_t written = (size_t)vsnprintf(buffer, size, format, args); /*NOBUG: WRANING: vsnprintf() insecure. Will not be fixed. Wrapper function. Issues addressed. No worry!*/
 
   // Check if the output was truncated.
@@ -784,6 +793,22 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
 
 int sf_underscore_vscprintf(const char *format, va_list pargs) {
   // https://9to5answer.com/replacement-for-ms-_vscprintf-on-macos-linux
+  if(format == NULL) {
+    fprintf(stderr, "Error: format is NULL. fn sf_underscore_vscprintf. \n");
+    return (-1);
+  }
+
+  if(sizeof(format) == 0) {
+    fprintf(stderr, "Error: format size is 0. fn sf_underscore_vscprintf. \n");
+    return (-1);
+  }
+
+  // Check if the format is large enough to hold the output.
+  if(sizeof(format) < 1) {
+    fprintf(stderr, "Error: buffer is too small. fn sf_underscore_vscprintf. \n");
+    return (-1);
+  }
+
   char hold[(int)MAX_LENGTH__VSCPRINTF] = "";
   int retval;
   va_list argcopy;
