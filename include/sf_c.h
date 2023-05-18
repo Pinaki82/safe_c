@@ -22,6 +22,7 @@
 
 #define MAX_BUFFER_LEN 4096 // needed by sf_vsscanf()
 #define MAX_FORMAT_LEN 4096 // needed by sf_vsscanf()
+#define MAX_LENGTH__VSCPRINTF 4096 // needed by sf_underscore_vscprintf()
 
 #include <math.h>
 #include <stdio.h>
@@ -113,11 +114,15 @@ bool sf_atoi(const char *str, int *result);
 
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
 
+int sf_underscore_vscprintf(const char *format, va_list pargs);
+
 // A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
 // an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
 int sf_sscanf(const char *restrict str, const char *restrict format, ...);
+
+int sf_flush_input_buffer();
 
 // function: holds the screen before the text disappears
 void sf_holdscr(void);
@@ -777,6 +782,17 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   return written;
 }
 
+int sf_underscore_vscprintf(const char *format, va_list pargs) {
+  // https://9to5answer.com/replacement-for-ms-_vscprintf-on-macos-linux
+  char hold[(int)MAX_LENGTH__VSCPRINTF] = "";
+  int retval;
+  va_list argcopy;
+  va_copy(argcopy, pargs);
+  retval = (int)sf_vsnprintf(hold, (int)MAX_LENGTH__VSCPRINTF, format, argcopy);
+  va_end(argcopy);
+  return retval;
+}
+
 /*
    sf_vsprintf - Safely format a variable argument list to a string buffer with size checking.
 
@@ -813,6 +829,13 @@ int sf_snprintf(char *dest, size_t dest_size, const char *format, ...) {
   int len = backup_4_safe_vsnprintf(dest, dest_size, format, args);
   va_end(args);
   return len;
+}
+
+int sf_flush_input_buffer() { // Clear the input buffer.
+  while((sf_getchar()) != '\n');
+
+  int bytes_read = read(0, NULL, 100);
+  return bytes_read;
 }
 
 // function: holds the screen before the text disappears

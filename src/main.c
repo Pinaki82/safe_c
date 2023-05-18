@@ -54,8 +54,7 @@ void vsprintf_test(char const *const format, ...) {
   int len;
   char *buffer;
   va_start(args, format);
-  //len = _vscprintf(format, args)   // _vscprintf doesn't count
-  len = vswprintf(NULL, 0, format, args) // Calculate the required buffer size
+  len = sf_underscore_vscprintf(format, args)   // _vscprintf doesn't count
         + 1; // terminating '\0'
   buffer = (char *) malloc((size_t)len * sizeof(char));
 
@@ -109,21 +108,15 @@ int main() { // main function
   sf_scanf("%d", &num, MAXBUFF); // FIXME:  GDB traceback to sf_scanf -> sf_sscanf -> sf_vsnprintf
   printf("You entered: %d\n", num);
   // Clear the input buffer.
-  //while ((getchar()) != '\n');
-  // Clear the input buffer.
-  int bytes_read = read(0, NULL, 100);
+  sf_flush_input_buffer();
   printf("                                            test: sf_getchar\n");
   // Clear the input buffer.
-  //while ((getchar()) != '\n');
-  // Clear the input buffer.
-  bytes_read = read(0, NULL, 100);
+  sf_flush_input_buffer();
   printf("Enter a character: ");
   one_char = sf_getchar();
   printf("The entered character is : %c\n", one_char);
   // Clear the input buffer.
-  //while ((getchar()) != '\n');
-  // Clear the input buffer.
-  bytes_read = read(0, NULL, 100);
+  sf_flush_input_buffer();
   printf("                                            test: sf_strcat\n");
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
