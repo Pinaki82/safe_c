@@ -38,7 +38,6 @@
 #define snprintf sf_snprintf
 #define strchr sf_strchr
 #define strncat sf_strncat
-#define fflush sf_fflush_out
 #define memmove sf_memmove
 #define strdup sf_strdup
 #define strndup sf_strndup
@@ -344,12 +343,12 @@ int main() { // main function
   int x = 5;
   sf_assert(x > 10);
   printf("x is greater than 10\n");
-  printf("This is a test for the fn sf_fflush_out.\n");
-  printf("                                            test: sf_fflush_out\n");
-  sf_fflush_out(stdout); // Ensure output is written immediately
+  printf("This is a test for the fn sf_flush_output_buffer.\n");
+  printf("                                            test: sf_flush_output_buffer\n");
+  sf_flush_output_buffer(stdout); // Ensure output is written immediately
   fprintf(stderr, "Error message.\n");
-  printf("                                            test: sf_fflush_out\n");
-  sf_fflush_out(stderr); // Ensure output is written immediately
+  printf("                                            test: sf_flush_output_buffer\n");
+  sf_flush_output_buffer(stderr); // Ensure output is written immediately
   return 0;
 }
 

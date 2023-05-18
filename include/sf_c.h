@@ -147,7 +147,7 @@ void sf_cls(void);
   } while (0)
 
 
-void sf_fflush_out(FILE *stream);
+int sf_flush_output_buffer(FILE *stream);
 
 int sf_vfprintf(FILE *stream, const char *format, va_list ap);
 
@@ -876,11 +876,23 @@ void sf_holdscr(void) {
 #endif
 }
 
-void sf_fflush_out(FILE *stream) {
+int sf_flush_output_buffer(FILE *stream) {
   /* TODO: check whether the stream is stdin. If so, return error. */
-  fflush(stream);
-}
+  if(stream != stdin) {
+    fflush(stream);
+    return (0);
+  }
 
+  else if(stream == stdin) {
+    fprintf(stderr, "Error: passed \'stdin\' to the fn sf_fflush_out.\n");
+    return (-1);
+  }
+
+  else {
+    fprintf(stderr, "Error: the fn sf_fflush_out encountered a strange error.\n");
+    return (-1);
+  }
+}
 
 int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
   //[Wrapper function]
