@@ -89,7 +89,8 @@ void sf_strcpy(char *dest, const char *src, size_t size);  //size=sizeof(dest). 
 
 void sf_strncpy(char *dest, const char *src, size_t n); //takes buffer size as an argument
 
-char *sf_gets(char *str, int size, FILE *stream); //takes buffer size as an argument
+//sf_gets(str01, sizeof(str01), stdin); //sizeof(str01) should be 4 to hold cat/dog and 6 to hold apple/mouse
+char *sf_gets(char *str, int size, FILE *stream);
 
 int sf_scanf(char *format, void *arg, size_t max_len); //takes buffer size as an argument
 
@@ -448,13 +449,19 @@ void sf_strncpy(char *dest, const char *src, size_t n) {
   }
 }
 
-//size=sizeof(dest). //takes buffer size as an argument
+//sf_gets(str01, sizeof(str01), stdin); //sizeof(str01) should be 4 to hold cat/dog and 6 to hold apple/mouse
 char *sf_gets(char *str, int size, FILE *stream) {
-  if(sf_fgets(str, size, stream) == NULL) { //fgets() returns NULL when the end of the file is reached
+  if (size <= 0) {
+    fprintf(stderr, "Error: Invalid buffer size. fn sf_gets.\n");
     return NULL;
   }
 
-  size_t len = sf_strlen(str, MAXBUFF); //strlen() returns the length of the string in bytes
+  if(sf_fgets(str, size, stream) == NULL) { //fgets() returns NULL when the end of the file is reached
+    fprintf(stderr, "Error: EOF is reached. fn sf_gets.\n");
+    return NULL;
+  }
+
+  size_t len = sf_strlen(str, sizeof(str)); //strlen() returns the length of the string in bytes
 
   if(len > 0 && str[len - 1] == '\n') { //if the last character of the string is a newline
     str[len - 1] = '\0'; //then remove it

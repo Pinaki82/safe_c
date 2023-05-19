@@ -1,6 +1,67 @@
 # safe_c
 
-Set of Custom C Functions that are Safe Alternatives.
+Set of Custom **C Functions** that are **Safe Alternatives**.
+
+# What is it?
+
+Compare the two following programs.
+
+```c
+// gcc -Wall -Wextra -pedantic -O2 -g test.c -o test
+// chmod +x test
+// ./test
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAXLEN 4 //to hold cat/dog. 6 to hold apple/mouse
+
+int main(void) {
+  char str01[MAXLEN] = "";
+  printf("Enter a string: ");
+  gets(str01);
+  printf("string is: %s\n", str01);
+  return 0;
+}
+```
+
+```
+./test
+Enter a string: catss
+string is: catss
+*** stack smashing detected ***: terminated
+Aborted (core dumped)
+```
+
+```c
+// gcc -Wall -Wextra -pedantic -O2 -g test.c -o test
+// chmod +x test
+// ./test
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../include/sf_c.h"
+
+#define MAXLEN 4 //to hold cat/dog. 6 to hold apple/mouse
+
+int main(void) {
+  char str01[MAXLEN] = "";
+  printf("Enter a string: ");
+  sf_gets(str01, sizeof(str01), stdin); // Look here
+  printf("string is: %s\n", str01);
+  return 0;
+}
+```
+
+```
+./test
+Enter a string: catss
+string is: cat
+```
+
+The version of the function `gets()` with the `sf_` prefix (i.e., `sf_gets()`) seems to be more secure. Not?
 
 #### Untested but available functions:
 
@@ -48,7 +109,7 @@ Set of Custom C Functions that are Safe Alternatives.
 #### Planned:
 
 ```
-fopen() [Already safe. Snippets required.]
+fopen() [Safe. Snippets required.]
 fwrite()
 fprintf()
 fputs()
@@ -59,12 +120,12 @@ setjmp()
 longjmp()
 signal()
 va_start(), va_arg() and va_end().
-system() [Sanitisation techniques required to be mentioned.]
+system() [Sanitisation techniques will be documented.]
 makepath -> _makepath_s (MSDN)
 _splitpath -> _splitpath_s (MSDN)
 ```
 
-#### Need to be investigated:
+#### Will be investigated:
 
 ```
 strlcpy()
