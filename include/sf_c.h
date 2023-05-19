@@ -112,6 +112,7 @@ int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
 int sf_sscanf(const char *restrict str, const char *restrict format, ...); //checks buffer size taken from an argument and checks for NULL ptrs
 
+// flushes the input buffer
 int sf_flush_input_buffer(void);
 
 // function: holds the screen before the text disappears
@@ -137,6 +138,7 @@ void sf_cls(void);
   } while (0)
 
 
+// flushes the output buffer
 int sf_flush_output_buffer(FILE *stream);
 
 int sf_vfprintf(FILE *stream, const char *format, va_list ap);
@@ -196,9 +198,9 @@ char *sf_strncat(char *dest, const char *src, size_t n);
 /* A backup function for snprintf() that uses another safe version of vsnprintf(). */
 int backup_4_safe_vsnprintf(char *dest, size_t dest_size, const char *format, va_list args);
 
-int *create_delim_dict(const char *delim, size_t max_len);
+int *create_delim_dict(const char *delim, size_t max_len); //needed by *sf_strtok()
 
-size_t calculate_required_size(const char *format, va_list args);
+size_t calculate_required_size(const char *format, va_list args); //needed by sf_vsnprintf()
 
 /* Fn definitions start here */
 
@@ -724,7 +726,7 @@ bool sf_atoi(const char *str, int *result) {
 }
 
 // Function to calculate the required buffer size for vsnprintf
-size_t calculate_required_size(const char *format, va_list args) {
+size_t calculate_required_size(const char *format, va_list args) { //needed by sf_vsnprintf()
   va_list args_copy;
   va_copy(args_copy, args);
   int required_size = vsnprintf(NULL, 0, format, args_copy);
@@ -1054,7 +1056,7 @@ errno_t sf_memset(
   return 0;
 }
 
-int *create_delim_dict(const char *delim, size_t max_len) {
+int *create_delim_dict(const char *delim, size_t max_len) { //needed by *sf_strtok()
   int *d = (int *)malloc(sizeof(int) * DICT_LEN);
 
   if(!d) {
