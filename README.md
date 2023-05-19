@@ -61,6 +61,44 @@ Enter a string: catss
 string is: cat
 ```
 
+Or,
+
+```c
+// Last Change: 2023-05-19  Friday: 11:56:18 PM
+// gcc -Wall -Wextra -pedantic -O2 -g test.c -o test
+// chmod +x test
+// ./test
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../include/sf_c.h"
+
+#define MAXLEN 5 //to hold cat/dog. 6 to hold apple/mouse
+
+int main(void) {
+  char *str01 = (char *)malloc((size_t)MAXLEN * sizeof(char));
+
+  if(str01 == NULL) {
+    fprintf(stderr, "\ndynamic memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
+
+  printf("Enter a string: ");
+  sf_gets(str01, MAXLEN, stdin);
+  printf("size is: %d, string is: %s\n", MAXLEN, str01);
+  free(str01);
+  str01 = NULL;
+  return 0;
+}
+```
+
+```
+./test
+Enter a string: catos
+size is: 5, string is: cato
+```
+
 The version of the function `gets()` with the `sf_` prefix (i.e., `sf_gets()`) seems to be more secure. Not?
 
 #### Untested but available functions:

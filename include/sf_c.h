@@ -1,4 +1,4 @@
-// Last Change: 2023-05-18  Thursday: 11:25:35 PM
+// Last Change: 2023-05-20  Saturday: 12:15:42 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -10,6 +10,11 @@
   typedef int errno_t;
 #endif
 
+#if !defined(_WIN32) || !defined(_WIN32_WINNT) || !defined(_WIN32_WINDOWS) || !defined(_WIN64) // https://iq.opengenus.org/detect-operating-system-in-c/
+  #include <stddef.h>  // for size_t, sf_strchr(), SIZE_MAX
+  #define _POSIX_C_SOURCE 200809L // https://stackoverflow.com/questions/46995050/gcc-warning-implicit-declaration-of-function-strnlen-when-dialect-c99-or-c11
+  #define __STDC_WANT_LIB_EXT1__
+#endif
 
 //MACRO, global variables, etc..
 #define MAXBUFF 1E+5f   // integer 1x10^+5 = 1 M. the max no. chars that will be dealt with.
@@ -27,7 +32,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>  // for size_t, sf_strchr(), SIZE_MAX
 #include <string.h>
 // https://learn.microsoft.com/en-us/cpp/c-runtime-library/file-constants?view=msvc-170
 #include <fcntl.h>
@@ -451,7 +455,16 @@ void sf_strncpy(char *dest, const char *src, size_t n) {
 
 //sf_gets(str01, sizeof(str01), stdin); //sizeof(str01) should be 4 to hold cat/dog and 6 to hold apple/mouse
 char *sf_gets(char *str, int size, FILE *stream) {
-  if (size <= 0) {
+  sf_initialize_char_variable(str);
+
+  // Check for null bytes in the input string and replace them with whitespace chars
+  for(size_t i = 0; i < sizeof(size); i++) {
+    if((str[i] == '\0') || (!isprint(str[i]))) {
+      str[i] = ' ';
+    }
+  }
+
+  if(size <= 0) {
     fprintf(stderr, "Error: Invalid buffer size. fn sf_gets.\n");
     return NULL;
   }
@@ -746,7 +759,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
     return (size_t)(-1);
   }
 
-  // Check for null bytes in the input buffer and replace them with a whitespace char
+  // Check for null bytes in the input buffer and replace them with whitespace chars
   //int found_null = 0;
 
   for(size_t i = 0; i < sizeof(size); i++) {
