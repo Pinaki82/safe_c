@@ -740,20 +740,20 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   }
 
   // Check for null bytes in the input buffer and replace them with a whitespace char
-  int found_null = 0;
+  //int found_null = 0;
 
   for(size_t i = 0; i < sizeof(size); i++) {
     if((buffer[i] == '\0') || (!isprint(buffer[i]))) {
       buffer[i] = ' ';
-      found_null = 1;
+      //found_null = 1;
     }
   }
 
-  if(found_null == 1) {
-    fprintf(stderr, "Error: NULL Byte/s were found in sf_vsnprintf. Replaced with whitespace chars.\n");
-    found_null = 0;
-  }
-
+  //if(found_null == 1) {
+  //fprintf(stderr, "Error: NULL Byte/s were found in sf_vsnprintf. Replaced with whitespace chars.\n");
+  //found_null = 0;
+  //}
+  //
   // Check if the buffer is uninitialized.
   sf_initialize_char_variable(buffer);
   // Check if the size is uninitialized.
