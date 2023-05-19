@@ -106,7 +106,7 @@ bool sf_atoi(const char *str, int *result); // if(sf_atoi(str, &result) == false
 
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args);
 
-int sf_underscore_vscprintf(const char *format, va_list pargs);
+int sf_underscore_vscprintf(const char *format, va_list pargs); // _vscprintf() everywhere
 
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args); //ensures that the destination buffer is not null and its size is at least 1.
 
@@ -369,7 +369,6 @@ void *sf_memmove(void *destn, const void *src, unsigned int n) {
   return destn;
 }
 
-// an alternative function to strlen() that checks buffer size as an argument
 // Based on // https://stackoverflow.com/questions/5935413/is-there-a-safe-version-of-strlen
 // Minor changes has been made with the help of ChatGPT and efforts on my part.
 /* // https://stackoverflow.com/questions/32599064/is-strlen-unsafe-when-getting-the-last-char-in-a-string-in-c
@@ -379,6 +378,8 @@ void *sf_memmove(void *destn, const void *src, unsigned int n) {
   char *str = (char *)NULL;
   len = sf_strlen2(str, max_len);  // no segmentation fault -- no crash
 */
+
+//takes buffer size as an argument
 size_t sf_strlen(const char *str, size_t max_len) {
   if(str == NULL) {
     // handle null string case
@@ -405,7 +406,7 @@ size_t sf_strlen(const char *str, size_t max_len) {
   }
 }
 
-// an alternative function to strcpy() that checks buffer size as an argument
+//takes buffer size as an argument
 void sf_strcpy(char *dest, const char *src, size_t size) {
   /*
     -------------------------------------------------------------------
@@ -434,7 +435,7 @@ void sf_strcpy(char *dest, const char *src, size_t size) {
   dest[i] = '\0';
 }
 
-// an alternative function to strncpy() that checks buffer size as an argument
+//takes buffer size as an argument
 void sf_strncpy(char *dest, const char *src, size_t n) {
   size_t i;
 
@@ -447,8 +448,8 @@ void sf_strncpy(char *dest, const char *src, size_t n) {
   }
 }
 
-// an alternative function to gets() that checks buffer size as an argument
-char *sf_gets(char *str, int size, FILE *stream) { //size=sizeof(dest).
+//size=sizeof(dest). //takes buffer size as an argument
+char *sf_gets(char *str, int size, FILE *stream) {
   if(sf_fgets(str, size, stream) == NULL) { //fgets() returns NULL when the end of the file is reached
     return NULL;
   }
@@ -460,13 +461,9 @@ char *sf_gets(char *str, int size, FILE *stream) { //size=sizeof(dest).
   }
 
   return str; //return the string in the buffer
-} // you can also do #define gets sf_gets in your source file.
+}
 
-// You won't be able to use strcpy,
-// strncpy, and gets from the compiler provided library anymore
-// because they are now macros and they are re-defined here.
-
-
+//takes buffer size 'size_t max_len' as an argument
 int sf_scanf(char *format, void *arg, size_t max_len) {
   // Read a line of input from stdin
   char *line = (char *)malloc(max_len + 1);
@@ -491,8 +488,8 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   return result;
 }
 
+//[Wrapper function]
 int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list vlist) {
-  //[Wrapper function]
   int ret;
 
   if(!buffer || !format) {
@@ -535,7 +532,7 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
   return ret;
 }
 
-// an alternative function to sscanf() that checks buffer size taken from an argument and checks for NULL ptrs
+//checks buffer size taken from an argument and checks for NULL ptrs
 int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   if(str == NULL || format == NULL) {
     // Invalid input
@@ -565,8 +562,6 @@ int sf_sscanf(const char *restrict str, const char *restrict format, ...) {
   return result;
 }
 
-
-// an alternative function to getchar() that handles input more appropriately
 int sf_getchar(void) {
   static char buf[BUFSIZ];
   static char *bufp = buf;
@@ -610,7 +605,7 @@ int sf_getchar(void) {
   Finally, the function returns a pointer to the destination string.
 */
 
-// an alternative function to strcat() that handles input more appropriately
+//takes the size of the destination buffer 'size_t dest_size' as an argument
 char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   // Get the length of the destination string
   size_t dest_len = sf_strlen(dest, MAXBUFF);
@@ -652,7 +647,6 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   return dest;
 }
 
-// an alternative function to sprintf() that handles input more appropriately
 int sf_sprintf(char *buffer, const char *format, ...) {
   if(buffer == NULL || format == NULL) {
     fprintf(stderr, "sf_sprintf: invalid input\n");
@@ -709,8 +703,7 @@ void sf_cls(void) {
 }
 #endif
 
-// an alternative function to atoi() that checks for invalid input
-// if(sf_atoi(str, &result) == false) // invalid output = false
+//checks for invalid input: if(sf_atoi(str, &result) == false) // invalid output = false
 bool sf_atoi(const char *str, int *result) {
   long long_val;
   char *endptr;
@@ -734,9 +727,8 @@ size_t calculate_required_size(const char *format, va_list args) { //needed by s
   return (required_size >= 0) ? (size_t)(required_size + 1) : 0;  // Add 1 for null terminator
 }
 
-
+//[Wrapper function]
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {//TODO: Check if a null byte is passed. Truncate output before sending to vsnprintf()
-  //[Wrapper function]
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf.\n");
     return (size_t)(-1);
@@ -769,6 +761,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   return written;
 }
 
+// _vscprintf() everywhere
 int sf_underscore_vscprintf(const char *format, va_list pargs) {
   // https://9to5answer.com/replacement-for-ms-_vscprintf-on-macos-linux
   if(format == NULL) {
@@ -815,7 +808,7 @@ int sf_underscore_vscprintf(const char *format, va_list pargs) {
        character. If an error occurs, a negative value is returned.
 */
 
-// A safe version of `vsprintf()` which ensures that the destination buffer is not null and its size is at least 1.
+//ensures that the destination buffer is not null and its size is at least 1.
 int sf_vsprintf(char *dest, size_t dest_size, const char *format, va_list args) {
   return (int)sf_vsnprintf(dest, dest_size, format, args);
 }
@@ -872,8 +865,8 @@ int sf_flush_output_buffer(FILE *stream) {
   }
 }
 
+//[Wrapper function]
 int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
-  //[Wrapper function]
   // Check for a null file pointer
   if(!stream) {
     return -1;
@@ -924,12 +917,13 @@ int sf_putchar(int c) {
   return putchar(c);  // safe to write to stdout
 }
 
+// _is_valid_input_char() in C, everywhere
 int sf_is_valid_input_char(char c) {
   return isprint((unsigned char) c);
 }
 
+//[Wrapper function]
 int sf_getc(FILE *stream, char *buffer, size_t buflen) {
-  //[Wrapper function]
   if(!buffer || buflen == 0) {
     return EOF;
   }
@@ -957,6 +951,7 @@ void *sf_memcpy(void *to, const void *from, size_t numBytes) {
 
 /* https://stackoverflow.com/questions/46013382/c-strndup-implicit-declaration */
 
+// strdup() everywhere
 char *sf_strdup(const char *s) {
   size_t size = sf_strlen(s, MAXBUFF) + 1;
   char *p;
@@ -979,6 +974,7 @@ char *sf_strdup(const char *s) {
   return p;
 }
 
+//strndup() everywhere
 char *sf_strndup(const char *s, size_t n) {
   char *p;
   size_t n1;
@@ -1007,8 +1003,8 @@ char *sf_strndup(const char *s, size_t n) {
   return p;
 }
 
+//[Wrapper function]
 char *sf_fgets(char *s, int size, FILE *stream) {
-  //[Wrapper function]
   if(size <= 0) {
     fprintf(stderr, "Error: Invalid buffer size.\n");
     return NULL;
@@ -1056,7 +1052,8 @@ errno_t sf_memset(
   return 0;
 }
 
-int *create_delim_dict(const char *delim, size_t max_len) { //needed by *sf_strtok()
+//needed by *sf_strtok()
+int *create_delim_dict(const char *delim, size_t max_len) {
   int *d = (int *)malloc(sizeof(int) * DICT_LEN);
 
   if(!d) {
@@ -1138,8 +1135,8 @@ char *sf_strtok(char *str, const char *delim, size_t max_len) {
   return (char *)str;
 }
 
+//[Wrapper function]
 int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
-  //[Wrapper function]
   /*
     - The function first formats the input string using vsnprintf() and stores it in a buffer.
     - It then checks for buffer overflow by comparing the length of the formatted string with the size of the buffer.
