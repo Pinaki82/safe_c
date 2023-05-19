@@ -1,4 +1,4 @@
-// Last Change: 2023-05-18  Thursday: 10:12:02 PM
+// Last Change: 2023-05-18  Thursday: 11:25:35 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -242,56 +242,56 @@ void sf_initialize_int_variable(int *variable) {
 }
 
 void sf_initialize_char_variable(char *variable) {
-  if(*variable == '\0') { // Variable is uninitialized. Initialize it to a default value.
-    *variable = ' '; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+  if(*variable == '\0') { // Variable is uninitialized. Initialize it to a default value. //NOBUG: False flag: The left operand of '==' is a garbage value.
+    *variable = ' ';
   }
 }
 
 void sf_initialize_float_variable(float *variable) {
   if(*variable == 0.0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0.0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0.0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_double_variable(double *variable) {
   if(*variable == 0.0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0.0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0.0;  //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_long_variable(long *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_long_long_variable(long long *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_unsigned_int_variable(unsigned int *variable) {
   if(*variable == 0) {
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_unsigned_char_variable(unsigned char *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_unsigned_long_variable(unsigned long *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_unsigned_long_long_variable(unsigned long long *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
@@ -303,31 +303,31 @@ void sf_initialize_size_t_variable(size_t *variable) {
 
 void sf_initialize_short_variable(short *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_unsigned_short_variable(unsigned short *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_signed_variable(signed *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_unsigned_variable(unsigned *variable) {
   if(*variable == 0) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = 0; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = 0; //NOBUG: False flag: Assignment is redundant.
   }
 }
 
 void sf_initialize_boolean_variable(bool *variable) {
   if(!*variable) { // Variable is uninitialized. Initialize it to a default value.
-    *variable = false; //NOBUG: False flag: Either the condition 'variable==NULL' is redundant or there is possible null pointer dereference: variable.
+    *variable = false;
   }
 }
 /* Initialization of uninitialized variables (END)*/
