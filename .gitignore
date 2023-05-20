@@ -73,6 +73,7 @@ chat-gpt-insecure-c-functions-flagged.html
 chat-gpt-alternative-to-system.html
 chat-gpt-buffer-overflow-vulnerability.html
 chat-gpt-insecure-c-functions-explanation.html
+CalculatingTheSizeOfArrInCallee.md
 tst.sh
 testfile2.txt
 testfile3.txt
