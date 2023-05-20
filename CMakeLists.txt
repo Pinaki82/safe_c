@@ -33,14 +33,14 @@ endif()
 # Set linker flags for all builds
 if(WIN32)
   # For Windows systems (MinGW-w64 or MSVC)
-  target_link_options(safe_c PRIVATE -static-libgcc -static-libstdc++ -lsafec)
+  target_link_options(safe_c PRIVATE -static-libgcc -static-libstdc++) # -lsafec
   if(MSVC)
     # For MSVC on Windows
     target_compile_options(safe_c PRIVATE /W4 /WX)
   endif()
 else()
   # For non-Windows systems (GCC or Clang)
-  target_link_options(safe_c PRIVATE -static -lsafec)
+  target_link_options(safe_c PRIVATE -static) # -lsafec
   # target_compile_options(safe_c PRIVATE -Werror)
 endif()
 
