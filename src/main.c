@@ -1,4 +1,4 @@
-// Last Change: 2023-05-17  Wednesday: 11:14:18 PM
+// Last Change: 2023-05-20  Saturday: 04:34:17 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -43,6 +43,9 @@
 #define strndup sf_strndup
 #define is_valid_input_char sf_is_valid_input_char
 
+#define VERSION "1" /* defines a constant string called "VERSION" with the value 1 */
+#define NO_OF_ARGS 1 /* the exact no. of command-line arguments the program takes */
+
 void vsprintf_test(char const *const format, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...);
 void writeFormattedOutput(FILE *stream, const char *format, ...);
@@ -55,7 +58,7 @@ void vsprintf_test(char const *const format, ...) {
   va_start(args, format);
   len = sf_underscore_vscprintf(format, args)   // _vscprintf doesn't count
         + 1; // terminating '\0'
-  buffer = (char *) malloc((size_t)len * sizeof(char));
+  buffer = (char *) malloc((size_t)len + 1 * sizeof(char));
 
   if(NULL != buffer) {
     sf_vsprintf(buffer, (size_t)len, format, args);
@@ -80,7 +83,27 @@ void writeFormattedOutput(FILE *stream, const char *format, ...) {
   va_end(args);
 }
 
-int main() { // main function
+int main(int argc, char *argv[]) { // main function
+  printf("Hey! \"%s\" here!\n", argv[0]); /* Displays the program's name */
+
+  if(argc == 2 && strcmp(argv[1], "--version") == 0) { /* checks if the program was called with the argument "--version". If it was, it prints out the value of the "VERSION" constant and returns 0. Otherwise, it slides down to the next `else if()` block. */
+    printf("%s\n", VERSION);
+    return 0;
+  }
+
+  else if(argc == 2 && strcmp(argv[1], "--version") != 0) { /* checks if the program was called with only ONE argument and the argument was not "--version". In that case, it displays an error message and exits with a return value of 1. */
+    printf("Unknown argument! The program will exit!!\n");
+    exit(1);
+  }
+
+  if(argc != NO_OF_ARGS) {  /* Checks if the program was called with the exact number of arguments. If it wasn't, it prints out an error message and returns 1. */
+    printf("Please provide %d arguments\n", (NO_OF_ARGS - 1));
+    return 1;
+  }
+
+  /* After performing all checks, your code starts here */
+  printf("First argument: %s\n", argv[1]); /* prints out the first argument passed to the program */
+  printf("Second argument: %s\n", argv[2]); /* prints out the second argument passed to the program */
   printf("                                            test: sf_strcpy\n");
   char dest[14]; // increased size of dest array
   int calc_out = 0;
