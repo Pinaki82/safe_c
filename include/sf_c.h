@@ -1,4 +1,4 @@
-// Last Change: 2023-05-20  Saturday: 12:15:42 AM
+// Last Change: 2023-05-21  Sunday: 03:29:33 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -44,18 +44,11 @@
 #include <stdint.h> // for uint8_t
 #include <wchar.h>
 
-
-
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
   #include  <windows.h>
 #else
-  #include <ncurses.h>
+  //#include <ncurses.h>
 #endif
-
-
-
-
-
 
 #ifdef __cplusplus
 extern "C" {
