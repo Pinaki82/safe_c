@@ -68,6 +68,7 @@ tags
 /lsp_files
 *.orig
 *.bak
+/personal
 Personal.txt
 chat-gpt-insecure-c-functions-flagged.html
 chat-gpt-alternative-to-system.html
