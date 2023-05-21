@@ -231,6 +231,142 @@ All functions in the `main` repository branch are tested and working as far as I
 
 Create a pull request or open an issue if you have a recommendation. Please feel free to improve the library project. Remember that the licence term is 'Boost Software Library Licence'.
 
+#### Test program's expected output:
+
+```
+Linux llll-H81M-WW 5.15.0-72-generic x86_64
+ 15:09:23 up  2:46,  1 user,  load average: 0.24, 0.63, 0.85
+ ~/D/safe_c   dev  ./buildproj.sh                Sunday 21 May 2023 03:09:24 PM
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/llll/Documents/safe_c/build
+[ 50%] Building C object CMakeFiles/safe_c.dir/src/main.c.o
+In file included from /home/llll/Documents/safe_c/src/main.c:7:
+/home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_getchar’:
+/home/llll/Documents/safe_c/include/sf_c.h:591:5: warning: ignoring return value of ‘fgets’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  591 |     fgets(buf, sizeof(buf), stdin);
+In file included from /home/llll/Documents/safe_c/src/main.c:7:
+/home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_cls’:
+/home/llll/Documents/safe_c/include/sf_c.h:722:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  722 |   system("clear");
+      |   ^~~~~~~~~~~~~~~
+In file included from /home/llll/Documents/safe_c/src/main.c:7:
+/home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_holdscr’:
+/home/llll/Documents/safe_c/include/sf_c.h:880:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  880 |   system("read ans"); // Linux. command explanation: `read` was used to read from stdin, `-p` means that the user will be prompted for input.  // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+      |   ^~~~~~~~~~~~~~~~~~
+[100%] Linking C executable safe_c
+[100%] Built target safe_c
+Hey! "./safe_c" here!
+First argument: (null)
+Second argument: SHELL=/bin/bash
+                                            test: sf_strcpy
+Hello, safety!
+                                            test: sf_strncpy
+Hello, safety!
+                                            test: sf_gets
+Type something and hit Enter
+Kalu was a black male cat.
+You entered: Kalu was a black male cat. Hello, safety!
+                                            test: sf_scanf
+Enter a number: 1011
+You entered: 1011
+
+
+                                            test: sf_getchar
+
+
+Enter a character: y
+The entered character is : y
+
+
+                                            test: sf_strcat
+Final destination string : |Hello, safety!Hello|                                            test: sf_sprintf
+Output:
+Kalu was a black male cat. 
+character count = 284
+                                            test: sf_atoi
+string value = Hello, safety!Hello, integer value = 0
+C was created in Bell Laboratory
+Please choose an option:
+1. Clear the screen.
+2. Keep the screen as it is.
+                                            test: sf_scanf
+2
+Keeping the screen as it is.
+                                            test: sf_holdscr
+Press any key to continue...
+
+                                            test: sf_puts
+Hello, Safety! puts 
+                                            test: sf_puts
+Error message! 
+                                            test: sf_getc
+File contains 13 r.
+                                            test: sf_strtok
+                                            test: sf_strtok
+ Wikipedia: Dark matter is a hypothetical form of matter thought to account for approximately 85% of the matter in the universe!!!
+  Dark matter is called "dark" because it does not appear to interact with the electromagnetic field, which means it does not absorb, reflect, or emit electromagnetic radiation and is, therefore, difficult to detect!!!
+  Most experts think that dark matter is abundant in the universe and has had a strong influence on its structure and evolution!!!
+                                            test: sf_strtok
+                                            test: sf_strtok
+ apple
+ banana
+ carrot
+                                            test: vsprintf_test
+123 < 456 
+                                            test: vsprintf_test
+This is a string 
+                                            test: sf_putc
+See the contents of the file "testfile2.txt"
+                                            test: sf_putchar
+123456789
+                                            test: sf_strcpy
+                                            test: sf_puts
+deststr: before memcpy:   
+                                            test: sf_puts
+Emulator! 
+                                            test: sf_memcpy
+                                            test: sf_puts
+deststr: after sf_memcpy:   
+                                            test: sf_puts
+Terminal 
+
+                                            test: sf_strdup
+strdupTest
+                                            test: sf_strndup
+strNdup
+                                            test: fputs
+                                            test: sf_fscanf
+Read String1 |We|
+Read String2 |are|
+Read String3 |testing|
+Read String4 |fscanfTest|
+Writing "HereIsMyName: Appu." onto buffer with capacity 15
+                                            test: sf_snprintf
+String written on buffer = "HereIsMyName:
+Value returned by sf_snprintf() method = 22
+                                            test: sf_strcpy
+                                            test: sf_sscanf
+March 25, 1989 = Saturday
+                                            test: sf_strcat
+                                            test: sf_strcat
+Pinaki 
+Gupta
+Pinaki Gupta
+see the output file textfile4.txt
+                                            test: sf_strchr
+String after |,| is - |, free, online encyclopedia written and maintained by a community of volunteers.|
+                                            test: sf_strncat
+HelloChatGPT
+                                            test: sf_holdscr
+Press any key to continue...
+
+                                            test: sf_assert
+Assertion failed: x > 10
+ !  ~/D/safe_c   dev         
+```
+
 #### Untested but available functions:
 
 ```
