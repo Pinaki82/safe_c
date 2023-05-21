@@ -893,7 +893,7 @@ void sf_holdscr(void) {
   /* prints a message to the console, flushes the buffer, and then reads a single character from the user input without echoing it to the terminal using the read command. Finally, it prints a newline character to ensure the cursor is on a new line before continuing. */
   printf("Press any key to continue...");
   fflush(stdout);
-  system("read ans"); // Linux. command explanation: `read` was used to read from stdin, `-p` means that the user will be prompted for input.  // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+  system("read ans"); // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
   printf("\n");
 #endif
 }

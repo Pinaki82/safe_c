@@ -253,7 +253,7 @@ In file included from /home/llll/Documents/safe_c/src/main.c:7:
 In file included from /home/llll/Documents/safe_c/src/main.c:7:
 /home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_holdscr’:
 /home/llll/Documents/safe_c/include/sf_c.h:880:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
-  880 |   system("read ans"); // Linux. command explanation: `read` was used to read from stdin, `-p` means that the user will be prompted for input.  // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+  880 |   system("read ans"); // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
       |   ^~~~~~~~~~~~~~~~~~
 [100%] Linking C executable safe_c
 [100%] Built target safe_c
