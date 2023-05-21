@@ -40,7 +40,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
-#include <unistd.h> //TODO: Try compiling without it
+//#include <unistd.h> //TODO: Try compiling without it
 #include <stdint.h> // for uint8_t
 #include <wchar.h>
 
@@ -856,10 +856,33 @@ int sf_snprintf(char *dest, size_t dest_size, const char *format, ...) {
 }
 
 int sf_flush_input_buffer(void) { // Clear the input buffer.
-  while((sf_getchar()) != '\n');
+  /*
+    The function first uses a loop with sf_getchar() to consume characters
+    until a newline ('\n') or EOF is encountered.
+    This step clears the input buffer up to the newline character.
 
-  int bytes_read = (int)read(0, NULL, 100);
-  return bytes_read;
+    After that, another loop is used to consume any remaining characters in
+    the input buffer until a newline or EOF is reached.
+    This ensures that the entire input buffer is cleared, even if there are
+    additional characters remaining.
+
+    The function returns the count of characters consumed and cleared
+    from the input buffer.
+  */
+  int c;
+  int count = 0;
+
+  while((c = sf_getchar()) != '\n' && c != EOF) {
+    count++;
+  }
+
+  int remaining;
+
+  while((remaining = sf_getchar()) != '\n' && remaining != EOF) {
+    count++;
+  }
+
+  return count;
 }
 
 // function: holds the screen before the text disappears
