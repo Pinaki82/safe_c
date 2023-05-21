@@ -660,7 +660,7 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   return dest;
 }
 
-int sf_sprintf(char *buffer, const char *format, ...) {
+int sf_sprintf(char *buffer, const char *format, ...) { //FIXME: exhibits undesirable behaviour (GCC)
   if(buffer == NULL || format == NULL) {
     fprintf(stderr, "sf_sprintf: invalid input\n");
     return -1;
@@ -717,7 +717,7 @@ void sf_cls(void) {
 #endif
 
 //checks for invalid input: if(sf_atoi(str, &result) == false) // invalid output = false
-bool sf_atoi(const char *str, int *result) {
+bool sf_atoi(const char *str, int *result) { //FIXME: exhibits undesirable behaviour (TCC)
   long long_val;
   char *endptr;
   long_val = strtol(str, &endptr, 10);
