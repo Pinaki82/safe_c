@@ -234,26 +234,24 @@ Create a pull request or open an issue if you have a recommendation. Please feel
 #### Test program's expected output:
 
 ```
-Linux llll-H81M-WW 5.15.0-72-generic x86_64
- 15:09:23 up  2:46,  1 user,  load average: 0.24, 0.63, 0.85
- ~/D/safe_c   dev  ./buildproj.sh                Sunday 21 May 2023 03:09:24 PM
+ !  ~/D/safe_c   dev *  ./buildproj.sh          Monday 22 May 2023 02:07:51 PM
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/llll/Documents/safe_c/build
+-- Build files have been written to: /home/YOUR_USERNAME/Documents/safe_c/build
 [ 50%] Building C object CMakeFiles/safe_c.dir/src/main.c.o
-In file included from /home/llll/Documents/safe_c/src/main.c:7:
-/home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_getchar’:
-/home/llll/Documents/safe_c/include/sf_c.h:591:5: warning: ignoring return value of ‘fgets’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
-  591 |     fgets(buf, sizeof(buf), stdin);
-In file included from /home/llll/Documents/safe_c/src/main.c:7:
-/home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_cls’:
-/home/llll/Documents/safe_c/include/sf_c.h:722:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
-  722 |   system("clear");
+In file included from /home/YOUR_USERNAME/Documents/safe_c/src/main.c:7:
+/home/YOUR_USERNAME/Documents/safe_c/include/sf_c.h: In function ‘sf_getchar’:
+/home/YOUR_USERNAME/Documents/safe_c/include/sf_c.h:584:5: warning: ignoring return value of ‘fgets’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  584 |     fgets(buf, sizeof(buf), stdin);
+In file included from /home/YOUR_USERNAME/Documents/safe_c/src/main.c:7:
+/home/YOUR_USERNAME/Documents/safe_c/include/sf_c.h: In function ‘sf_cls’:
+/home/YOUR_USERNAME/Documents/safe_c/include/sf_c.h:715:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  715 |   system("clear");
       |   ^~~~~~~~~~~~~~~
-In file included from /home/llll/Documents/safe_c/src/main.c:7:
-/home/llll/Documents/safe_c/include/sf_c.h: In function ‘sf_holdscr’:
-/home/llll/Documents/safe_c/include/sf_c.h:880:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
-  880 |   system("read ans"); // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+In file included from /home/YOUR_USERNAME/Documents/safe_c/src/main.c:7:
+/home/YOUR_USERNAME/Documents/safe_c/include/sf_c.h: In function ‘sf_holdscr’:
+/home/YOUR_USERNAME/Documents/safe_c/include/sf_c.h:896:3: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  896 |   system("read ans"); // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
       |   ^~~~~~~~~~~~~~~~~~
 [100%] Linking C executable safe_c
 [100%] Built target safe_c
@@ -276,17 +274,36 @@ You entered: 1011
                                             test: sf_getchar
 
 
-Enter a character: y
-The entered character is : y
+Enter a character: Y
+The entered character is : Y
 
 
                                             test: sf_strcat
-Final destination string : |Hello, safety!Hello|                                            test: sf_sprintf
-Output:
-Kalu was a black male cat. 
-character count = 284
+Final destination string : |Hello, safety!Hello|
+
+
+                                            test: sf_sprintf
+
+Sum of 10 and 20 is 30
+
+                                            test: sf_strndup
+                                            test: sf_strlen
+The new string is: "Hi, there" from "Hi, there!"
+sf_strlen size 10
+                                            test: sf_gets
+                                            test: sf_scanf
+Enter your name: Pinaki
+Enter your designation: Freelancer
+Enter your salary: 7000
+
+                                            test: sf_sprintf
+
+Welcome Pinaki  !
+Name: Pinaki  
+Designation: Freelancer 
+Salary: 7000
                                             test: sf_atoi
-string value = Hello, safety!Hello, integer value = 0
+string value = Hello, safety!Hello, integer value = 50
 C was created in Bell Laboratory
 Please choose an option:
 1. Clear the screen.
@@ -364,7 +381,7 @@ Press any key to continue...
 
                                             test: sf_assert
 Assertion failed: x > 10
- !  ~/D/safe_c   dev         
+ !  ~/D/safe_c   dev * 
 ```
 
 #### Untested but available functions:

@@ -106,8 +106,8 @@ int main(int argc, char *argv[]) { // main function
   printf("Second argument: %s\n", argv[2]); /* prints out the second argument passed to the program */
   printf("                                            test: sf_strcpy\n");
   char dest[14]; // increased size of dest array
-  int calc_out = 0;
-  char buffer[100];
+  int calc_out = 50;
+  char buffer[300];
   const char *src = "Hello";
   size_t n = 5;
   int one_char;
@@ -142,16 +142,44 @@ int main(int argc, char *argv[]) { // main function
   printf("                                            test: sf_strcat\n");
   sf_strcat(dest, src, MAXBUFF);
   printf("Final destination string : |%s|", dest);
+  printf("\n");
+  // Clear the input buffer.
+  sf_flush_input_buffer();
+
+  for(int i = 0; i < (int)sizeof(buffer); i++) {
+    buffer[i] = '\0'; //clean up the stored value
+  }
+
   printf("                                            test: sf_sprintf\n");
-  char  sprbuff[200] = "", s__2[] = "computer", c__2 = 'l';
-  int   i = 35, j;
-  float flpnt = 1.7320534f;
-  // Format and print various data:
-  j  = sf_sprintf(sprbuff,     "   String:    %205s\n", s__2);   // C4996
-  j += sf_sprintf(sprbuff + j, "   Character: %c\n", c__2);   // C4996
-  j += sf_sprintf(sprbuff + j, "   Integer:   %10d\n", i);   // C4996
-  j += sf_sprintf(sprbuff + j, "   Real:      %5f\n", flpnt);  // C4996
-  printf("Output:\n%s\ncharacter count = %d\n", buffer, j);
+  int aa = 10, bb = 20, cc; //https://www.geeksforgeeks.org/sprintf-in-c/
+  cc = aa + bb;
+  printf("\n");
+  sf_sprintf(buffer, "Sum of %d and %d is %d\n", aa, bb, cc);
+  // The string "sum of 10 and 20 is 30" is stored
+  // into the buffer instead of printing to stdout
+  printf("%s\n", buffer);
+  printf("                                            test: sf_strndup\n");
+  printf("                                            test: sf_strlen\n");
+  char *str_hi = "Hi, there!";
+  char *new_str = sf_strndup(str_hi, sf_strlen(str_hi, BUFSIZ) - 1);
+  printf("The new string is: \"%s\" from \"Hi, there!\"\nsf_strlen size %ld\n", new_str, sf_strlen(str_hi, BUFSIZ));
+  printf("                                            test: sf_gets\n");
+  printf("                                            test: sf_scanf\n");
+  //https://overiq.com/c-programming-101/the-sprintf-function-in-c/
+  int factorial(int);
+  int sal;
+  char name[30] = "", designation[30] = "", info[60] = "";
+  printf("Enter your name: ");
+  sf_gets(name, sizeof(name), stdin);
+  printf("Enter your designation: ");
+  sf_gets(designation, sizeof(designation), stdin);
+  printf("Enter your salary: ");
+  sf_scanf("%d", &sal, 10);
+  printf("\n");
+  printf("                                            test: sf_sprintf\n");
+  sf_sprintf(info, "Welcome %s !\nName: %s \nDesignation: %s\nSalary: %d",
+             name, name, designation, sal);
+  printf("\n%s\n", info);
   printf("                                            test: sf_atoi\n");
 
   if(sf_atoi(dest, &calc_out) == false) { // invalid output = false

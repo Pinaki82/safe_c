@@ -660,7 +660,7 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   return dest;
 }
 
-int sf_sprintf(char *buffer, const char *format, ...) { //FIXME: exhibits undesirable behaviour (GCC)
+int sf_sprintf(char *buffer, const char *format, ...) { //TODO: Initialise variables if not
   if(buffer == NULL || format == NULL) {
     fprintf(stderr, "sf_sprintf: invalid input\n");
     return -1;
@@ -717,7 +717,7 @@ void sf_cls(void) {
 #endif
 
 //checks for invalid input: if(sf_atoi(str, &result) == false) // invalid output = false
-bool sf_atoi(const char *str, int *result) { //FIXME: exhibits undesirable behaviour (TCC)
+bool sf_atoi(const char *str, int *result) { //TODO: Initialise variables if not
   long long_val;
   char *endptr;
   long_val = strtol(str, &endptr, 10);
@@ -741,7 +741,7 @@ size_t calculate_required_size(const char *format, va_list args) { //needed by s
 }
 
 //[Wrapper function]
-size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {//TODO: Check if a null byte is passed. Truncate output before sending to vsnprintf()
+size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {//TODO: Check if a null byte is passed. Initialise variables if not. Truncate output before sending to vsnprintf()
   if(buffer == NULL) {
     fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf.\n");
     return (size_t)(-1);
@@ -899,7 +899,7 @@ void sf_holdscr(void) {
 }
 
 int sf_flush_output_buffer(FILE *stream) {
-  /* TODO: check whether the stream is stdin. If so, return error. */
+  /* TODO: (Done!) check whether the stream is stdin. If so, return error. */
   if(stream != stdin) {
     fflush(stream);
     return (0);
