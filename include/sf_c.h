@@ -1,4 +1,4 @@
-// Last Change: 2023-05-21  Sunday: 03:29:33 PM
+// Last Change: 2023-05-22  Monday: 06:09:34 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -390,16 +390,16 @@ size_t sf_strlen(const char *str, size_t max_len) {
     return 0;
   }
 
-  else {
-    const char *end = (const char *)memchr(str, '\0', max_len);
+  else { // handle non-null string case
+    const char *end = (const char *)memchr(str, '\0', max_len); //Explanation: memchr returns a pointer to the first occurrence of a character in a string.
 
     if(end == NULL) {
       // string is longer than max_len
-      return max_len - 1;
+      return max_len - 1; // length of string minus the null terminator
     }
 
-    else {
-      return (size_t)(end - str);
+    else { // string is shorter than max_len
+      return (size_t)(end - str); // subtract the null terminator
     }
   }
 }
@@ -899,7 +899,7 @@ void sf_holdscr(void) {
 }
 
 int sf_flush_output_buffer(FILE *stream) {
-  /* TODO: (Done!) check whether the stream is stdin. If so, return error. */
+  /* checks whether the stream is stdin. if so, returns error. */
   if(stream != stdin) {
     fflush(stream);
     return (0);

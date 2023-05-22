@@ -1,4 +1,4 @@
-// Last Change: 2023-05-20  Saturday: 04:34:17 PM
+// Last Change: 2023-05-22  Monday: 06:08:05 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) { // main function
   printf("                                            test: sf_scanf\n");
   int num = 0;
   printf("Enter a number: ");
-  sf_scanf("%d", &num, MAXBUFF); // FIXME:  GDB traceback to sf_scanf -> sf_sscanf -> sf_vsnprintf
+  sf_scanf("%d", &num, MAXBUFF);
   printf("You entered: %d\n", num);
   // Clear the input buffer.
   sf_flush_input_buffer();
