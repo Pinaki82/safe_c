@@ -1,4 +1,4 @@
-// Last Change: 2023-05-22  Monday: 06:09:34 PM
+// Last Change: 2023-05-23  Tuesday: 12:40:14 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -583,13 +583,21 @@ int sf_getchar(void) {
   if(n == 0) {
     fgets(buf, sizeof(buf), stdin);
     bufp = buf;
+    n = (int)sf_strlen(buf, sizeof(buf));
   }
 
   if(*bufp != '\0') {
+    n--;
     return *bufp++;
   }
 
-  return EOF;
+  // Check for end-of-file
+  if(feof(stdin)) {
+    return EOF;
+  }
+
+  // Return a default value
+  return 0;
 }
 
 /*
@@ -857,7 +865,7 @@ int sf_snprintf(char *dest, size_t dest_size, const char *format, ...) {
 
 int sf_flush_input_buffer(void) { // Clear the input buffer.
   /*
-    The function first uses a loop with sf_getchar() to consume characters
+    The function first uses a loop with getchar() to consume characters
     until a newline ('\n') or EOF is encountered.
     This step clears the input buffer up to the newline character.
 
@@ -871,17 +879,25 @@ int sf_flush_input_buffer(void) { // Clear the input buffer.
   */
   int c;
   int count = 0;
+  //printf("Entering sf_flush_input_buffer()\n");
 
+  // Consume and discard characters until a newline or EOF is encountered
   while((c = sf_getchar()) != '\n' && c != EOF) {
     count++;
+    //printf("Consumed character: %c (ASCII: %d)\n", c, c);
   }
 
+  //printf("Exited first loop\n");
+  // Clear any remaining characters in the input buffer
   int remaining;
 
   while((remaining = sf_getchar()) != '\n' && remaining != EOF) {
     count++;
+    //printf("Discarded character: %c (ASCII: %d)\n", remaining, remaining);
   }
 
+  //printf("Exited second loop\n");
+  //printf("Exiting sf_flush_input_buffer()\n");
   return count;
 }
 
@@ -1061,10 +1077,18 @@ char *sf_fgets(char *s, int size, FILE *stream) {
     return NULL;
   }
 
-  char *ret = fgets(s, size, stream);
+  char *ret = fgets(s, size, stream); //Inside the wrapper (sf_fgets is fgets)
 
-  if(ret == NULL) {
-    return ret;
+  if(ret == NULL || sf_strlen(ret, sizeof(ret)) == 0) {
+    if(feof(stream)) {
+      return NULL;
+    }
+
+    else {
+      // Some other error occurred
+      fprintf(stderr, "Error reading from input stream.\n");
+      return NULL;
+    }
   }
 
   // Remove the newline character at the end, if present
@@ -1079,6 +1103,11 @@ char *sf_fgets(char *s, int size, FILE *stream) {
     if(!isprint(s[i])) {
       s[i] = ' ';
     }
+  }
+
+  // Check for end-of-file
+  if(feof(stream)) {
+    return NULL;
   }
 
   return ret;
