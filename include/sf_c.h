@@ -1240,7 +1240,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
   }
 
   va_copy(arg_copy, arg);
-  int result = vfscanf(stream, format, arg_copy); //NOBUG: Won't be fixed. Input checked. In a wrapper function
+  int result = vfscanf(stream, format, arg_copy); //NOBUG: Won't be fixed. Input checked. In a wrapper function.
   //NOBUG: False flag: 'format' is not a string-literal
   va_end(arg_copy);
 
