@@ -1,4 +1,4 @@
-// Last Change: 2023-05-23  Tuesday: 12:40:14 AM
+// Last Change: 2023-05-23  Tuesday: 11:34:09 AM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -14,6 +14,10 @@
   #include <stddef.h>  // for size_t, sf_strchr(), SIZE_MAX
   #define _POSIX_C_SOURCE 200809L // https://stackoverflow.com/questions/46995050/gcc-warning-implicit-declaration-of-function-strnlen-when-dialect-c99-or-c11
   #define __STDC_WANT_LIB_EXT1__
+#else
+  #if defined( _WIN32 ) || defined( _WIN64 )
+    #include <stddef.h>
+  #endif
 #endif
 
 //MACRO, global variables, etc..
