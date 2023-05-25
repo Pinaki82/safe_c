@@ -79,6 +79,7 @@ void sf_initialize_unsigned_variable(unsigned *variable);
 void sf_initialize_boolean_variable(bool *variable);
 /* Initialization of uninitialized variables (END)*/
 
+/*usage: sf_memmove(p, s, (uint32_t)(size + 1));*/
 void *sf_memmove(void *destn, const void *src, unsigned int n);
 
 
@@ -86,7 +87,8 @@ size_t sf_strlen(const char *str, size_t max_len); //takes buffer size as an arg
 
 // https://www.tutorialspoint.com/c_standard_library/c_function_strncpy.htm
 
-void sf_strcpy(char *dest, const char *src, size_t size);  //size=sizeof(dest). Increase size at declaration. The fn takes buffer size as an argument.
+//note: size=sizeof(dest).
+void sf_strcpy(char *dest, const char *src, size_t size);  // Increase size at declaration. The fn takes buffer size as an argument.
 
 void sf_strncpy(char *dest, const char *src, size_t n); //takes buffer size as an argument
 
@@ -326,6 +328,7 @@ void sf_initialize_boolean_variable(bool *variable) {
 }
 /* Initialization of uninitialized variables (END)*/
 
+/*usage: sf_memmove(p, s, (uint32_t)(size + 1));*/
 void *sf_memmove(void *destn, const void *src, unsigned int n) {
   n = n + 1;
   char *pDest = (char *)destn;
@@ -936,6 +939,7 @@ int sf_flush_output_buffer(FILE *stream) {
   }
 }
 
+/* From: sf_c.h */
 //[Wrapper function]
 int sf_vfprintf(FILE *stream, const char *format, va_list ap) {
   // Check for a null file pointer
