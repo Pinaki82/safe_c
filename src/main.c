@@ -1,4 +1,4 @@
-// Last Change: 2023-05-22  Monday: 10:53:10 PM
+// Last Change: 2023-05-26  Friday: 12:38:22 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -44,7 +44,7 @@
 #define is_valid_input_char sf_is_valid_input_char
 
 #define VERSION "1" /* defines a constant string called "VERSION" with the value 1 */
-#define NO_OF_ARGS 1 /* the exact no. of command-line arguments the program takes */
+#define NO_OF_ARGS 2 /* the exact no. of command-line arguments the program takes */
 
 void vsprintf_test(char const *const format, ...);
 void writing_out(char *buf, int buf_size, const char *fmt, ...);
@@ -91,7 +91,11 @@ int main(int argc, char *argv[]) { // main function
     return 0;
   }
 
-  else if(argc == 2 && strcmp(argv[1], "--version") != 0) { /* checks if the program was called with only ONE argument and the argument was not "--version". In that case, it displays an error message and exits with a return value of 1. */
+  else if(argc == 2 && strcmp(argv[1], "-r") == 0) { /* checks if the program was called with only ONE argument and the argument was not "-r". */
+    printf("supplied argument: -r. The program will run.\n");
+  }
+
+  else if((argc == 2 && strcmp(argv[1], "--version") != 0) || (argc == 2 && strcmp(argv[1], "-r") != 0)) { /* checks if the program was called with only ONE argument and the argument was not "--version". In that case, it displays an error message and exits with a return value of 1. */
     printf("Unknown argument! The program will exit!!\n");
     exit(1);
   }
@@ -103,7 +107,6 @@ int main(int argc, char *argv[]) { // main function
 
   /* After performing all checks, your code starts here */
   printf("First argument: %s\n", argv[1]); /* prints out the first argument passed to the program */
-  printf("Second argument: %s\n", argv[2]); /* prints out the second argument passed to the program */
   printf("                                            test: sf_strcpy\n");
   char dest[14]; // increased size of dest array
   int calc_out = 50;

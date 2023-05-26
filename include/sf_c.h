@@ -1,4 +1,4 @@
-// Last Change: 2023-05-23  Tuesday: 11:34:09 AM
+// Last Change: 2023-05-26  Friday: 12:39:01 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -766,6 +766,8 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
     fprintf(stderr, "Error: size is 0. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
+
+  sf_initialize_char_variable(buffer);
 
   // Check for null bytes in the input buffer and replace them with whitespace chars
   //int found_null = 0;
