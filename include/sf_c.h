@@ -1,4 +1,4 @@
-// Last Change: 2023-05-26  Friday: 12:39:01 PM
+// Last Change: 2023-05-26  Friday: 02:37:20 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -19,6 +19,10 @@
     #include <stddef.h>
   #endif
 #endif
+
+
+
+
 
 //MACRO, global variables, etc..
 #define MAXBUFF 1E+5f   // integer 1x10^+5 = 1 M. the max no. chars that will be dealt with.
@@ -59,6 +63,8 @@ extern "C" {
 #endif
 
 int sf_is_valid_input_char(char c);
+
+static inline size_t sf_strnlen(const char *string, size_t length);
 
 /* Initialization of uninitialized variables */
 void sf_initialize_int_variable(int *variable);
@@ -207,6 +213,13 @@ int *create_delim_dict(const char *delim, size_t max_len); //needed by *sf_strto
 size_t calculate_required_size(const char *format, va_list args); //needed by sf_vsnprintf()
 
 /* Fn definitions start here */
+
+
+static inline size_t sf_strnlen(const char *string, size_t length) { //NOTE: Custom implementation.
+  //https://e2e.ti.com/support/tools/code-composer-studio-group/ccs/f/code-composer-studio-forum/598070/compiler-cc3220-missing-strnlen
+  char *ret = memchr(string, 0, length);
+  return ret ? ret - string : length;
+}
 
 /*
     Initialization of uninitialized variables.
@@ -681,7 +694,7 @@ int sf_sprintf(char *buffer, const char *format, ...) { //TODO: Initialise varia
     return -1;
   }
 
-  size_t buffer_len = strnlen(buffer, BUFSIZ);
+  size_t buffer_len = sf_strnlen(buffer, BUFSIZ); //NOTE: Custom implementation used here because of TCC.
 
   if(buffer_len == BUFSIZ) {
     fprintf(stderr, "sf_sprintf: buffer is too small\n");
