@@ -1,4 +1,4 @@
-// Last Change: 2023-05-26  Friday: 02:37:20 PM
+// Last Change: 2023-05-26  Friday: 10:37:33 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -218,7 +218,7 @@ size_t calculate_required_size(const char *format, va_list args); //needed by sf
 static inline size_t sf_strnlen(const char *string, size_t length) { //NOTE: Custom implementation.
   //https://e2e.ti.com/support/tools/code-composer-studio-group/ccs/f/code-composer-studio-forum/598070/compiler-cc3220-missing-strnlen
   char *ret = memchr(string, 0, length);
-  return ret ? ret - string : length;
+  return (size_t)(ret ? ret - string : (char)length);
 }
 
 /*
@@ -694,7 +694,7 @@ int sf_sprintf(char *buffer, const char *format, ...) { //TODO: Initialise varia
     return -1;
   }
 
-  size_t buffer_len = sf_strnlen(buffer, BUFSIZ); //NOTE: Custom implementation used here because of TCC.
+  size_t buffer_len = sf_strnlen(buffer, BUFSIZ); //NOTE: Custom implementation used here because of TCC on Windows.
 
   if(buffer_len == BUFSIZ) {
     fprintf(stderr, "sf_sprintf: buffer is too small\n");

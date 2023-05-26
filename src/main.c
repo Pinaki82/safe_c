@@ -1,4 +1,4 @@
-// Last Change: 2023-05-26  Friday: 12:38:22 PM
+// Last Change: 2023-05-26  Friday: 10:35:44 PM
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) { // main function
   printf("                                            test: sf_strlen\n");
   char *str_hi = "Hi, there!";
   char *new_str = sf_strndup(str_hi, sf_strlen(str_hi, BUFSIZ) - 1);
-  printf("The new string is: \"%s\" from \"Hi, there!\"\nsf_strlen size %ld\n", new_str, sf_strlen(str_hi, BUFSIZ));
+  printf("The new string is: \"%s\" from \"Hi, there!\"\nsf_strlen size %llu\n", new_str, sf_strlen(str_hi, BUFSIZ));
   printf("                                            test: sf_gets\n");
   printf("                                            test: sf_scanf\n");
   //https://overiq.com/c-programming-101/the-sprintf-function-in-c/
