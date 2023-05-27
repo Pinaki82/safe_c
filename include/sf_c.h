@@ -1,4 +1,4 @@
-// Last Change: 2023-05-26  Friday: 10:37:33 PM
+// Last Change: 2023-05-27  Saturday: 09:41:13 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -25,7 +25,7 @@
 
 
 //MACRO, global variables, etc..
-#define MAXBUFF 1E+5f   // integer 1x10^+5 = 1 M. the max no. chars that will be dealt with.
+#define MAXBUFF 1E+5f   // integer 1x10^+5 = 100000 = 1 M. the max no. chars that will be dealt with.
 
 #ifndef BUFSIZ // needed by sf_getchar()
   #define BUFSIZ 1024
