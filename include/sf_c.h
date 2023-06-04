@@ -1,4 +1,4 @@
-// Last Change: 2023-05-27  Saturday: 09:41:13 PM
+// Last Change: 2023-06-04  Sunday: 11:24:01 PM
 /*
    Licence: Boost Software License, https://www.boost.org/users/license.html
 */
@@ -141,7 +141,7 @@ void sf_cls(void);
 #define sf_assert(expr) \
   do { \
     if (!(expr)) { \
-      fprintf(stderr, "Assertion failed: %s\n", #expr); \
+      (void)fprintf(stderr, "Assertion failed: %s\n", #expr); \
       errno = EFAULT; \
       return -1; \
     } \
@@ -348,17 +348,17 @@ void *sf_memmove(void *destn, const void *src, unsigned int n) {
   const char *pSrc = (const char *)src;
 
   if(n < 2) {
-    fprintf(stderr, "Invalid memmove() call: !n\n");
+    (void)fprintf(stderr, "Invalid memmove() call: !n\n");
     return NULL;
   }
 
   if(src == NULL) {
-    fprintf(stderr, "Invalid memmove() call: src == NULL\n");
+    (void)fprintf(stderr, "Invalid memmove() call: src == NULL\n");
     return NULL;
   }
 
   if(destn == NULL) {
-    fprintf(stderr, "Invalid destination buffer\n");
+    (void)fprintf(stderr, "Invalid destination buffer\n");
     return NULL;
   }
 
@@ -376,7 +376,7 @@ void *sf_memmove(void *destn, const void *src, unsigned int n) {
   else { // if the current position in the destination buffer (pDest + i) is greater than or equal to the end of the destination buffer ((char*)destn + n). If it is, an error message is printed and NULL is returned.
     for(unsigned int i = 0; i < n; i++) {
       if((pDest + i) >= ((char *)destn + n)) {
-        fprintf(stderr, "Destination buffer is not big enough\n");
+        (void)fprintf(stderr, "Destination buffer is not big enough\n");
         return NULL;
       }
 
@@ -401,7 +401,7 @@ void *sf_memmove(void *destn, const void *src, unsigned int n) {
 size_t sf_strlen(const char *str, size_t max_len) {
   if(str == NULL) {
     // handle null string case
-    fprintf(stderr, "%s", "null string!\n");
+    (void)fprintf(stderr, "%s", "null string!\n");
     return 0;
   }
 
@@ -478,12 +478,12 @@ char *sf_gets(char *str, int size, FILE *stream) {
   }
 
   if(size <= 0) {
-    fprintf(stderr, "Error: Invalid buffer size. fn sf_gets.\n");
+    (void)fprintf(stderr, "Error: Invalid buffer size. fn sf_gets.\n");
     return NULL;
   }
 
   if(sf_fgets(str, size, stream) == NULL) { //fgets() returns NULL when the end of the file is reached
-    fprintf(stderr, "Error: EOF is reached. fn sf_gets.\n");
+    (void)fprintf(stderr, "Error: EOF is reached. fn sf_gets.\n");
     return NULL;
   }
 
@@ -510,7 +510,7 @@ int sf_scanf(char *format, void *arg, size_t max_len) {
   // Check if input exceeded max length
   if(sf_strlen(line, MAXBUFF) == max_len && line[max_len - 1] != '\n') {
     // Input exceeded max length
-    fprintf(stderr, "Input exceeded maximum length of %zu characters\n", max_len);
+    (void)fprintf(stderr, "Input exceeded maximum length of %zu characters\n", max_len);
     free(line);
     return EOF;
   }
@@ -526,7 +526,7 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
   int ret;
 
   if(!buffer || !format) {
-    fprintf(stderr, "Null pointer or invalid input passed to sf_vsscanf\n");
+    (void)fprintf(stderr, "Null pointer or invalid input passed to sf_vsscanf\n");
     return -1;
   }
 
@@ -535,20 +535,20 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
 
   // Check for out of bounds
   if(buffer_len >= MAX_BUFFER_LEN || format_len >= MAX_FORMAT_LEN) {
-    fprintf(stderr, "Buffer or format is too large in sf_vsscanf\n");
+    (void)fprintf(stderr, "Buffer or format is too large in sf_vsscanf\n");
     return -1;
   }
 
   // Check for empty input
   if((buffer_len == 0) || (format_len == 0)) {
-    fprintf(stderr, "Buffer or format is empty in sf_vsscanf\n");
+    (void)fprintf(stderr, "Buffer or format is empty in sf_vsscanf\n");
     return -1;
   }
 
   // Check for null bytes in the input buffer
   for(size_t i = 0; i < buffer_len; i++) {
     if(buffer[i] == '\0') {
-      fprintf(stderr, "Null byte passed to sf_vsscanf\n");
+      (void)fprintf(stderr, "Null byte passed to sf_vsscanf\n");
       return -1;
     }
   }
@@ -556,7 +556,7 @@ int sf_vsscanf(const char *restrict buffer, const char *restrict format, va_list
   // Check for invalid input characters
   for(size_t i = 0; i < format_len; i++) {
     if(!sf_is_valid_input_char(format[i])) {
-      fprintf(stderr, "Invalid input character passed to sf_vsscanf\n");
+      (void)fprintf(stderr, "Invalid input character passed to sf_vsscanf\n");
       return -1;
     }
   }
@@ -601,7 +601,10 @@ int sf_getchar(void) {
   static int n = 0;
 
   if(n == 0) {
-    fgets(buf, sizeof(buf), stdin);
+    if(fgets(buf, sizeof(buf), stdin) == NULL) {
+      return EOF;
+    }
+
     bufp = buf;
     n = (int)sf_strlen(buf, sizeof(buf));
   }
@@ -656,7 +659,7 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
   // Check if there is enough space in the destination buffer to append the source string
   if(dest_size - (dest_len + 1) <= src_len) {
     // If there isn't enough space, print an error message to stderr and return NULL
-    fprintf(stderr, "safe_strcat: destination buffer is too small\n");
+    (void)fprintf(stderr, "safe_strcat: destination buffer is too small\n");
     return NULL; // Not enough space in destination buffer
   }
 
@@ -690,14 +693,14 @@ char *sf_strcat(char *dest, const char *src, size_t dest_size) {
 
 int sf_sprintf(char *buffer, const char *format, ...) { //TODO: Initialise variables if not
   if(buffer == NULL || format == NULL) {
-    fprintf(stderr, "sf_sprintf: invalid input\n");
+    (void)fprintf(stderr, "sf_sprintf: invalid input\n");
     return -1;
   }
 
   size_t buffer_len = sf_strnlen(buffer, BUFSIZ); //NOTE: Custom implementation used here because of TCC on Windows.
 
   if(buffer_len == BUFSIZ) {
-    fprintf(stderr, "sf_sprintf: buffer is too small\n");
+    (void)fprintf(stderr, "sf_sprintf: buffer is too small\n");
     return -1;
   }
 
@@ -707,7 +710,7 @@ int sf_sprintf(char *buffer, const char *format, ...) { //TODO: Initialise varia
   va_end(args);
 
   if(((size_t)result < 0) || ((size_t)result >= (BUFSIZ - buffer_len))) { //WARNING: unsignedLessThanZero: Checking if unsigned expression '(unsigned long long)result' is less than zero.
-    fprintf(stderr, "sf_sprintf: buffer overflow\n");
+    (void)fprintf(stderr, "sf_sprintf: buffer overflow\n");
     return -1;
   }
 
@@ -740,7 +743,11 @@ void sf_cls(void) {
 }
 #else  // For Linux and Mac
 void sf_cls(void) {
-  system("clear");
+  int systemRet = system("clear");
+
+  if(systemRet == -1) {
+    (void)fprintf(stderr, "sf_cls: system() failed\n");
+  }
 }
 #endif
 
@@ -771,12 +778,12 @@ size_t calculate_required_size(const char *format, va_list args) { //needed by s
 //[Wrapper function]
 size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args) {//TODO: Check if a null byte is passed. Initialise variables if not. Truncate output before sending to vsnprintf()
   if(buffer == NULL) {
-    fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf.\n");
+    (void)fprintf(stderr, "Error: buffer is NULL. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
 
   if(size == 0) {
-    fprintf(stderr, "Error: size is 0. fn sf_vsnprintf.\n");
+    (void)fprintf(stderr, "Error: size is 0. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
 
@@ -793,7 +800,7 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   }
 
   //if(found_null == 1) {
-  //fprintf(stderr, "Error: NULL Byte/s were found in sf_vsnprintf. Replaced with whitespace chars.\n");
+  //(void)fprintf(stderr, "Error: NULL Byte/s were found in sf_vsnprintf. Replaced with whitespace chars.\n");
   //found_null = 0;
   //}
   //
@@ -801,11 +808,11 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
   sf_initialize_char_variable(buffer);
   // Check if the size is uninitialized.
   sf_initialize_size_t_variable(&size);
-  // Calculate the required size
+  // Last Change: 2023-06-04  Sunday: 11:25:16 PM
   size_t required_size = calculate_required_size(format, args);
 
   if(required_size == 0) {
-    fprintf(stderr, "Error: Failed to calculate required size. fn sf_vsnprintf.\n");
+    (void)fprintf(stderr, "Error: Failed to calculate required size. fn sf_vsnprintf.\n");
     return (size_t)(-1);
   }
 
@@ -823,18 +830,18 @@ size_t sf_vsnprintf(char *buffer, size_t size, const char *format, va_list args)
 int sf_underscore_vscprintf(const char *format, va_list pargs) {
   // https://9to5answer.com/replacement-for-ms-_vscprintf-on-macos-linux
   if(format == NULL) {
-    fprintf(stderr, "Error: format is NULL. fn sf_underscore_vscprintf. \n");
+    (void)fprintf(stderr, "Error: format is NULL. fn sf_underscore_vscprintf. \n");
     return (-1);
   }
 
   if(sizeof(format) == 0) {
-    fprintf(stderr, "Error: format size is 0. fn sf_underscore_vscprintf. \n");
+    (void)fprintf(stderr, "Error: format size is 0. fn sf_underscore_vscprintf. \n");
     return (-1);
   }
 
   // Check if the format is large enough to hold the output.
   if(sizeof(format) < 1) {
-    fprintf(stderr, "Error: buffer is too small. fn sf_underscore_vscprintf. \n");
+    (void)fprintf(stderr, "Error: buffer is too small. fn sf_underscore_vscprintf. \n");
     return (-1);
   }
 
@@ -930,8 +937,8 @@ void sf_holdscr(void) {
 #else
   /* prints a message to the console, flushes the buffer, and then reads a single character from the user input without echoing it to the terminal using the read command. Finally, it prints a newline character to ensure the cursor is on a new line before continuing. */
   printf("Press any key to continue...");
-  fflush(stdout);
-  system("read ans"); // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
+  (void)fflush(stdout);
+  (void)system("read ans"); // https://unix.stackexchange.com/questions/293940/how-can-i-make-press-any-key-to-continue
   printf("\n");
 #endif
 }
@@ -939,17 +946,17 @@ void sf_holdscr(void) {
 int sf_flush_output_buffer(FILE *stream) {
   /* checks whether the stream is stdin. if so, returns error. */
   if(stream != stdin) {
-    fflush(stream);
+    (void)fflush(stream);
     return (0);
   }
 
   else if(stream == stdin) {
-    fprintf(stderr, "Error: passed \'stdin\' to the fn sf_fflush_out.\n");
+    (void)fprintf(stderr, "Error: passed \'stdin\' to the fn sf_fflush_out.\n");
     return (-1);
   }
 
   else {
-    fprintf(stderr, "Error: the fn sf_fflush_out encountered a strange error.\n");
+    (void)fprintf(stderr, "Error: the fn sf_fflush_out encountered a strange error.\n");
     return (-1);
   }
 }
@@ -985,13 +992,13 @@ void sf_puts(const char *s, FILE *stream) {
     }
   }
 
-  fprintf(stream, "%s\n", sanitized_str);
+  (void)fprintf(stream, "%s\n", sanitized_str);
   free(sanitized_str);
 }
 
 int sf_putc(int c, FILE *stream) {
   if(!isprint(c)) {
-    fprintf(stderr, "Error: Non-printable character detected in input.\n");
+    (void)fprintf(stderr, "Error: Non-printable character detected in input.\n");
     return EOF;
   }
 
@@ -1048,7 +1055,7 @@ char *sf_strdup(const char *s) {
   p = (char *)malloc((size_t)(size) * sizeof(char));
 
   if(p == NULL) {
-    fprintf(stderr, "\ndynamic memory allocation failed\n");
+    (void)fprintf(stderr, "\ndynamic memory allocation failed\n");
     exit(EXIT_FAILURE);
   }
 
@@ -1076,7 +1083,7 @@ char *sf_strndup(const char *s, size_t n) {
   p = (char *)malloc((size_t)(n + 1) * sizeof(char));
 
   if(p == NULL) {
-    fprintf(stderr, "\ndynamic memory allocation failed\n");
+    (void)fprintf(stderr, "\ndynamic memory allocation failed\n");
     exit(EXIT_FAILURE);
   }
 
@@ -1096,7 +1103,7 @@ char *sf_strndup(const char *s, size_t n) {
 //[Wrapper function]
 char *sf_fgets(char *s, int size, FILE *stream) {
   if(size <= 0) {
-    fprintf(stderr, "Error: Invalid buffer size.\n");
+    (void)fprintf(stderr, "Error: Invalid buffer size.\n");
     return NULL;
   }
 
@@ -1109,7 +1116,7 @@ char *sf_fgets(char *s, int size, FILE *stream) {
 
     else {
       // Some other error occurred
-      fprintf(stderr, "Error reading from input stream.\n");
+      (void)fprintf(stderr, "Error reading from input stream.\n");
       return NULL;
     }
   }
@@ -1253,12 +1260,12 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
   va_end(arg_copy);
 
   if(n < 0 || n >= BUFSIZ) {
-    fprintf(stderr, "Error: buffer overflow in sf_vfscanf.\n");
+    (void)fprintf(stderr, "Error: buffer overflow in sf_vfscanf.\n");
     return EOF;
   }
 
   if(sf_strchr(buffer, '\0') != buffer + n) {
-    fprintf(stderr, "Error: Null bytes in sf_vfscanf.\n");
+    (void)fprintf(stderr, "Error: Null bytes in sf_vfscanf.\n");
     return EOF;
   }
 
@@ -1268,12 +1275,12 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
   va_end(arg_copy);
 
   if(result == EOF) {
-    fprintf(stderr, "Error: Invalid input in sf_vfscanf.\n");
+    (void)fprintf(stderr, "Error: Invalid input in sf_vfscanf.\n");
     return EOF;
   }
 
   if(ftell(stream) > BUFSIZ) {
-    fprintf(stderr, "Error: File position indicator out of bounds in sf_vfscanf.\n");
+    (void)fprintf(stderr, "Error: File position indicator out of bounds in sf_vfscanf.\n");
     return EOF;
   }
 
@@ -1283,7 +1290,7 @@ int sf_vfscanf(FILE *stream, const char *format, va_list arg) {
 int sf_fscanf(FILE *fp, const char *format, ...) { // TODO: Improvements required. Buff overflow, null bytes, invalid inputs
   // Check for NULL stream and format
   if(fp == NULL || format == NULL) {
-    fprintf(stderr, "Error: Invalid input passed to sf_fscanf.\n");
+    (void)fprintf(stderr, "Error: Invalid input passed to sf_fscanf.\n");
     return EOF;
   }
 
@@ -1300,7 +1307,7 @@ char *sf_strchr(const char *s, int c) {
      of the character c in the string s.
      If the character is not found, it returns NULL. */
   if(s == NULL) {
-    fprintf(stderr, "Error: Invalid input passed to my_strchr.\n");
+    (void)fprintf(stderr, "Error: Invalid input passed to my_strchr.\n");
     return NULL;
   }
 
