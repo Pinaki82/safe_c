@@ -1344,7 +1344,7 @@ char *sf_strncat(char *dest, const char *src, size_t n) {
 
   if(total_len >= n) {
     src_len = n - dest_len - 1;
-    printf("Source string was truncated to fit the destination buffer\n");
+    /*(void)printf("Source string was truncated to fit the destination buffer\n");*/
   }
 
   sf_memmove(dest + dest_len, src, (uint32_t)(src_len + 1));
